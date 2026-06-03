@@ -136,9 +136,11 @@ function applyI18n() {
         const d = btn.dataset.domain;
         if (d) {
             btn.textContent = domainLabel(d);
-            if (d !== 'ALL') btn.title = t('domainFull' + d) || domainLabel(d);
+            btn.title = filterControlLabel(d);
+            btn.setAttribute('aria-label', filterControlLabel(d));
         }
     });
+    refreshFilterButtonStyles();
     // Welcome text
     const welcomeTextEl = document.getElementById('welcome-text');
     if (welcomeTextEl) welcomeTextEl.textContent = t('welcomeText');
@@ -653,6 +655,30 @@ function domainLabel(d) {
     return t('domain' + d) || d;
 }
 
+function domainFullLabel(d) {
+    if (d === 'ALL') return t('filterAll');
+    return t('domainFull' + d) || domainLabel(d);
+}
+
+function filterControlLabel(d) {
+    const short = domainLabel(d);
+    const full = domainFullLabel(d);
+    if (d === 'ALL' || short === full) return full;
+    return `${short} - ${full}`;
+}
+
+function refreshFilterButtonStyles() {
+    const activeDomain = activeFilter || 'ALL';
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+        const d = btn.dataset.domain;
+        if (!d) return;
+        const baseColor = btn.dataset.baseColor || (d === 'ALL' ? '#c8d0dc' : (DC[d] || '#556'));
+        btn.style.color = d === activeDomain ? '#f7db95' : baseColor;
+        btn.title = filterControlLabel(d);
+        btn.setAttribute('aria-label', filterControlLabel(d));
+    });
+}
+
 function buildFilters() {
     const bar = document.getElementById('filter-bar');
     const domains = ['ALL', 'MAT', 'PHY', 'CHE', 'BIO', 'MED', 'ENG', 'TEC', 'SOC', 'HUM', 'PHI', 'ART', 'HIS'];
@@ -661,17 +687,21 @@ function buildFilters() {
         btn.type = 'button';
         btn.className = 'filter-btn' + (d === 'ALL' ? ' active' : '');
         btn.textContent = domainLabel(d);
-        btn.style.color = d === 'ALL' ? '#c8d0dc' : (DC[d] || '#556');
-        if (d !== 'ALL') btn.title = t('domainFull' + d) || domainLabel(d);
+        btn.dataset.baseColor = d === 'ALL' ? '#c8d0dc' : (DC[d] || '#556');
+        btn.style.color = btn.dataset.baseColor;
+        btn.title = filterControlLabel(d);
+        btn.setAttribute('aria-label', filterControlLabel(d));
         btn.dataset.domain = d;
         btn.onclick = () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             activeFilter = d === 'ALL' ? null : d;
+            refreshFilterButtonStyles();
             applyVisibility();
         };
         bar.appendChild(btn);
     });
+    refreshFilterButtonStyles();
 }
 
 function applyVisibility() {
@@ -987,7 +1017,7 @@ function buildGraph() {
     sim.restart();
 
     svgEl.on('click', () => {
-        document.getElementById('panel').classList.remove('open');
+        setPanelOpenState(false);
         clearHighlights();
     });
 
@@ -1111,12 +1141,18 @@ function centerViewOnNode(node, duration = 500) {
     svgEl.transition().duration(duration).call(zoomBehavior.transform, transform);
 }
 
+function setPanelOpenState(isOpen) {
+    const panel = document.getElementById('panel');
+    if (!panel) return;
+    panel.classList.toggle('open', !!isOpen);
+    document.body.classList.toggle('panel-open', !!isOpen);
+}
+
 // ===== PANEL =====
 function openPanel(d) {
     currentPanelNodeId = d.id;
-    if (navHistory[navHistory.length - 1] !== d.id) {
-        navHistory.push(d.id);
-    }
+    navHistory = navHistory.filter(id => id !== d.id);
+    navHistory.push(d.id);
     if (navHistory.length > 10) navHistory.shift();
     saveNavHistory();
     renderBreadcrumb();
@@ -1179,10 +1215,11 @@ function openPanel(d) {
         connItem(c.node, c.rel, c.pending)
     ).join('');
 
-    document.getElementById('panel').classList.add('open');
+    setPanelOpenState(true);
 
     // Highlight
     clearHighlights();
+    nodeEls.classed('selected-node', n => n.id === d.id);
     relatedLabelIds = getRelatedNodeIds(d.id);
     updateLabelVisibility();
     if (lpMode) {
@@ -1436,6 +1473,7 @@ function highlightPrereqChain(id) {
 
 function clearHighlights() {
     linkEls.classed('highlight', false);
+    nodeEls.classed('selected-node', false);
     nodeEls.classed('on-path', false);
     relatedLabelIds = new Set();
     updateLabelVisibility();
@@ -1588,7 +1626,7 @@ function focusNode(id) {
 
 // ===== CLOSE PANEL =====
 document.getElementById('close').onclick = () => {
-    document.getElementById('panel').classList.remove('open');
+    setPanelOpenState(false);
     clearHighlights();
     if (lpMode) applyLPVisibility();
 };

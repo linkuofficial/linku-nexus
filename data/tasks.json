@@ -16,5 +16,59 @@
     "result": null,
     "error": "",
     "finished_at": "2026-05-27T09:49:00.741661+00:00"
+  },
+  "22a8d631-37b0-407f-8192-3d99889ca270": {
+    "id": "22a8d631-37b0-407f-8192-3d99889ca270",
+    "status": "failed",
+    "started_at": "2026-05-27T13:53:44.343560+00:00",
+    "params": {
+      "phase": 2,
+      "domain": "MAT",
+      "subdomain": "calculus",
+      "batch_size": 1,
+      "batches": 1,
+      "structured": true,
+      "critique": true
+    },
+    "progress": 100,
+    "result": null,
+    "error": "",
+    "finished_at": "2026-05-27T13:53:44.346558+00:00"
+  },
+  "323f01bc-e518-4702-be68-b53da86383e2": {
+    "id": "323f01bc-e518-4702-be68-b53da86383e2",
+    "status": "failed",
+    "started_at": "2026-05-27T17:54:00.481381+00:00",
+    "params": {
+      "phase": 2,
+      "domain": "MAT",
+      "subdomain": "calculus",
+      "batch_size": 1,
+      "batches": 1,
+      "structured": true,
+      "critique": true
+    },
+    "progress": 100,
+    "result": null,
+    "error": "",
+    "finished_at": "2026-05-27T17:54:00.488775+00:00"
+  },
+  "902b3668-be3f-44e1-867f-4f184d9eaa69": {
+    "id": "902b3668-be3f-44e1-867f-4f184d9eaa69",
+    "status": "failed",
+    "started_at": "2026-05-27T17:55:25.441838+00:00",
+    "params": {
+      "phase": 2,
+      "domain": "MAT",
+      "subdomain": "calculus",
+      "batch_size": 1,
+      "batches": 1,
+      "structured": true,
+      "critique": true
+    },
+    "progress": 100,
+    "result": null,
+    "error": "",
+    "finished_at": "2026-05-27T17:55:25.445116+00:00"
   }
 }

@@ -1,4 +1,4 @@
-/** English translations for the Nexus Knowledge Graph UI. */
+/** English translations for the Nodus Knowledge Graph UI. */
 export default {
     title: 'Knowledge Graph',
     loading: 'Loading graph...',

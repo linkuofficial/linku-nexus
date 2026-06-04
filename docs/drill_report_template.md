@@ -1,4 +1,4 @@
-# Nexus Drill Report Template
+# Nodus Drill Report Template
 
 ## Drill Metadata
 

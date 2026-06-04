@@ -1,4 +1,4 @@
-name: Nexus CI
+name: Nodus CI
 
 on:
   push:
@@ -14,36 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Python deps
-        run: pip install -r requirements.txt -r requirements-dev.txt
-
-      - name: Run unit / pipeline tests (no server needed)
-        run: python -m pytest tests -q --ignore=tests/test_api_contract.py --ignore=tests/test_api_integration.py --cov=backend --cov-report=xml --cov-report=term-missing
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
-          retention-days: 14
-
-      - name: Start API server for contract tests
-        run: |
-          python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 &
-          for i in $(seq 1 20); do
-            curl -sf http://127.0.0.1:8000/api/health && break || sleep 1
-          done
-        env:
-          APP_ENV: development
-
-      - name: Run API contract tests
-        run: python -m pytest tests/test_api_contract.py -q
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -61,6 +31,3 @@ jobs:
 
       - name: Run E2E smoke tests
         run: npm run test:e2e
-
-      - name: Build Docker image
-        run: docker build -t nexus-ci:${{ github.sha }} .

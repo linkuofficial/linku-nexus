@@ -1,4 +1,4 @@
-# NEXUS Claude Chrome Report 歸檔分析（2026-05-28）
+# NODUS Claude Chrome Report 歸檔分析（2026-05-28）
 
 ## 1. 歸檔目的
 

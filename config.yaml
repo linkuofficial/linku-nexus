@@ -1,10 +1,10 @@
-# ─── Nexus Knowledge Graph Configuration ───────────────────────
+# ─── Nodus Knowledge Graph Configuration ───────────────────────
 # 所有可調參數集中管理，避免 hardcoded magic numbers
 
 generation:
   # Override individual models via environment variables:
-  #   NEXUS_GENERATION_MODEL=claude-opus-4   python scripts/generate_nodes.py
-  #   NEXUS_CRITIQUE_MODEL=claude-haiku-4    python scripts/generate_nodes.py
+  #   NODUS_GENERATION_MODEL=claude-opus-4   python scripts/generate_nodes.py
+  #   NODUS_CRITIQUE_MODEL=claude-haiku-4    python scripts/generate_nodes.py
   model: "claude-sonnet-4-6"
   critique_model: "claude-haiku-4"  # 品質審查用輕量模型（成本 ~12x 低於 Sonnet）
   max_tokens_base: 2000        # 基礎 token 上限

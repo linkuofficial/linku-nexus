@@ -1,4 +1,4 @@
-name: Nexus Nightly Performance
+name: Nodus Nightly Performance
 
 on:
   schedule:
@@ -147,9 +147,9 @@ jobs:
             ) if violations else "- benchmark guard failed"
           summary = guard.get("violation_summary", {})
 
-          title = "Nexus nightly benchmark failed"
+          title = "Nodus nightly benchmark failed"
           if os.environ.get("DRILL_MODE") == "true":
-              title = "Nexus nightly benchmark drill failed (expected)"
+              title = "Nodus nightly benchmark drill failed (expected)"
 
           drill_reason = os.environ.get("DRILL_REASON") or "manual drill"
           drill_line = f"\\nDrill reason: {drill_reason}" if os.environ.get("DRILL_MODE") == "true" else ""

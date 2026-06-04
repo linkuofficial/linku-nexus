@@ -42,7 +42,7 @@ PROMPT_FILE = BASE_DIR / CONFIG["paths"]["prompt_file"]
 BATCH_DIR = BASE_DIR / CONFIG["paths"]["batch_dir"]
 LOG_FILE = BASE_DIR / CONFIG["paths"]["log_file"]
 
-from nexus_utils import VALID_DOMAINS
+from nodus_utils import VALID_DOMAINS
 
 # ── 載入現有節點 ───────────────────────────────────────
 def load_existing_nodes():
@@ -224,7 +224,7 @@ def extract_json(raw: str) -> dict:
 # ── Structured Output Schema（tool_use 模式）──────────
 NODE_SCHEMA = {
     "name": "generate_knowledge_nodes",
-    "description": "Generate knowledge graph nodes following the Nexus schema.",
+    "description": "Generate knowledge graph nodes following the Nodus schema.",
     "input_schema": {
         "type": "object",
         "properties": {

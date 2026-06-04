@@ -1,4 +1,4 @@
-# Nexus Deployment Environment Matrix
+# Nodus Deployment Environment Matrix
 
 更新日期：2026-05-24
 

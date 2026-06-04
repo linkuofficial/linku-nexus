@@ -1,4 +1,4 @@
-﻿"""
+"""
 apply_p0_enhancements.py
 ------------------------
 Apply approved enhancement wave descriptions to all_nodes.json.

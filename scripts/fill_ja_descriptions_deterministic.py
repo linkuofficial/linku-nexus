@@ -88,7 +88,7 @@ def _make_description(node: dict[str, Any], ja_label: str) -> str:
         "基礎概念・方法・実践を接続する学習上の中核テーマである。"
     )
     second = (
-        "Nexusでは関連ノードとの接続を通じて、定義、意義、応用範囲を"
+        "Nodusでは関連ノードとの接続を通じて、定義、意義、応用範囲を"
         "段階的に理解できるよう設計されている。"
     )
     third = (

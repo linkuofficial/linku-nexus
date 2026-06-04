@@ -1,8 +1,8 @@
-# Nexus Alert and Rollback Runbook
+# Nodus Alert and Rollback Runbook
 
 ## Scope
 
-This runbook defines how to decide severity after receiving an alert and how to execute a safe rollback for Nexus.
+This runbook defines how to decide severity after receiving an alert and how to execute a safe rollback for Nodus.
 
 ## Inputs and Preconditions
 
@@ -45,7 +45,7 @@ npm run rollback -- --image <previous-image-tag>
 
 Optional arguments:
 
-- `--container <name>`: target container name (default: `nexus`)
+- `--container <name>`: target container name (default: `nodus`)
 - `--port <host-port>`: published host port (default: `8000`)
 - `--env-file <path>`: env file path (default: `.env`)
 - `--dry-run`: print actions without changing runtime
@@ -53,7 +53,7 @@ Optional arguments:
 Example:
 
 ```bash
-npm run rollback -- --image nexus:2026-05-24-rc1 --container nexus --port 8000
+npm run rollback -- --image nodus:2026-05-24-rc1 --container nodus --port 8000
 ```
 
 ## Rollback Execution Steps
@@ -87,9 +87,9 @@ npm run rollback -- --image nexus:2026-05-24-rc1 --container nexus --port 8000
 
 ### Info
 
-- App: `nexus-linku`
+- App: `nodus-linku`
 - Region: `nrt` (Tokyo)
-- URL: https://nexus.linku.tech (custom domain) / https://nexus-linku.fly.dev (fallback)
+- URL: https://nodus.linku.tech (custom domain) / https://nodus-linku.fly.dev (fallback)
 - IPv4: `66.241.124.42` / IPv6: `2a09:8280:1::11c:a15:0`
 - VM: shared-cpu-1x, 512MB × 2 machines (HA)
 - Auto-stop on idle, auto-start on request
@@ -97,49 +97,49 @@ npm run rollback -- --image nexus:2026-05-24-rc1 --container nexus --port 8000
 ### Deploy
 
 ```bash
-fly deploy --app nexus-linku
+fly deploy --app nodus-linku
 ```
 
 ### Rollback (Fly.io)
 
 ```bash
 # List recent deployments
-fly releases --app nexus-linku
+fly releases --app nodus-linku
 
 # Rollback to previous image
-fly deploy --app nexus-linku --image registry.fly.io/nexus-linku:<previous-tag>
+fly deploy --app nodus-linku --image registry.fly.io/nodus-linku:<previous-tag>
 ```
 
 ### Secrets
 
 ```bash
 # View secret names
-fly secrets list --app nexus-linku
+fly secrets list --app nodus-linku
 
 # Set a secret
-fly secrets set KEY=VALUE --app nexus-linku
+fly secrets set KEY=VALUE --app nodus-linku
 ```
 
 ### Logs & Monitoring
 
 ```bash
-fly logs --app nexus-linku
-fly status --app nexus-linku
-fly checks list --app nexus-linku
+fly logs --app nodus-linku
+fly status --app nodus-linku
+fly checks list --app nodus-linku
 ```
 
 ### Scale
 
 ```bash
 # Scale memory (e.g. to 1024MB)
-fly scale memory 1024 --app nexus-linku
+fly scale memory 1024 --app nodus-linku
 
 # Scale machine count
-fly scale count 2 --app nexus-linku
+fly scale count 2 --app nodus-linku
 ```
 
 ### Custom Domain
 
 - DNS managed in Cloudflare (`linku.tech` zone)
 - A/AAAA records pointing to Fly IPs (DNS only, no proxy)
-- TLS certificate managed by Fly.io (`fly certs check nexus.linku.tech`)
+- TLS certificate managed by Fly.io (`fly certs check nodus.linku.tech`)

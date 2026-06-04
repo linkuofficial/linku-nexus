@@ -1,4 +1,4 @@
-nexus.linku.tech {
+nodus.linku.tech {
     encode zstd gzip
 
     reverse_proxy localhost:8000
@@ -10,6 +10,6 @@ nexus.linku.tech {
     }
 }
 
-www.nexus.linku.tech {
-    redir https://nexus.linku.tech{uri} permanent
+www.nodus.linku.tech {
+    redir https://nodus.linku.tech{uri} permanent
 }

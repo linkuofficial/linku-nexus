@@ -1,0 +1,11 @@
+:root {
+    --nodus-accent: #f0c050;
+    --nodus-radius-sm: 6px;
+    --nodus-radius-md: 12px;
+    --nodus-radius-lg: 20px;
+    --nodus-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.38);
+    --nodus-shadow-strong: 0 24px 56px rgba(0, 0, 0, 0.58);
+    --nodus-ease-ui: cubic-bezier(0.16, 1, 0.3, 1);
+    --nodus-glass-border: rgba(255, 255, 255, 0.08);
+    --nodus-glass-shadow: 0 0 20px rgba(196, 198, 206, 0.05);
+}

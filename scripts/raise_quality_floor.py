@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from quality_check import score_node
-from nexus_utils import word_count
+from nodus_utils import word_count
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 NODES_PATH = BASE_DIR / "data" / "all_nodes.json"

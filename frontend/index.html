@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="utf-8" />
-    <script src="/nexus-tokens.js"></script>
+    <script src="/nodus-tokens.js"></script>
     <script>
         (function () {
             try {
-                let lang = localStorage.getItem('nexus-lang') || 'en';
+                let lang = localStorage.getItem('nodus-lang') || 'en';
                 if (lang === 'zh-TW') lang = 'zh';
                 document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : (lang === 'ja' ? 'ja' : 'en');
             } catch (e) {
@@ -16,20 +16,20 @@
         })();
     </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta name="description" content="Nexus helps you turn complex topics into clear, connected learning paths.">
-    <meta property="og:title" content="Nexus - Deep Field Survey">
+    <meta name="description" content="Nodus helps you turn complex topics into clear, connected learning paths.">
+    <meta property="og:title" content="Nodus - Deep Field Survey">
     <meta property="og:description"
         content="Search concepts and jump into a connected knowledge graph with guided learning paths.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/favicon.svg">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Nexus - Deep Field Survey">
+    <meta name="twitter:title" content="Nodus - Deep Field Survey">
     <meta name="twitter:description"
         content="Search concepts and jump into a connected knowledge graph with guided learning paths.">
     <meta name="twitter:image" content="/favicon.svg">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <title>Nexus - Deep Field Survey</title>
-    <link rel="stylesheet" href="/nexus-theme.css">
+    <title>Nodus - Deep Field Survey</title>
+    <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="/src/index-tailwind.css">
     <style>
         body {
@@ -41,8 +41,8 @@
             background-color: rgba(26, 31, 38, 0.4);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--nexus-glass-border);
-            box-shadow: var(--nexus-glass-shadow);
+            border: 1px solid var(--nodus-glass-border);
+            box-shadow: var(--nodus-glass-shadow);
         }
 
         .search-glow:focus-within {
@@ -51,7 +51,7 @@
         }
 
         .search-cta-flash {
-            animation: searchCtaFlash 720ms var(--nexus-ease-ui);
+            animation: searchCtaFlash 720ms var(--nodus-ease-ui);
             border-color: rgba(240, 192, 80, 0.55) !important;
             box-shadow: 0 0 0 2px rgba(240, 192, 80, 0.18), 0 0 24px rgba(240, 192, 80, 0.2);
         }
@@ -213,7 +213,7 @@
             opacity: 0;
             transform: translateY(8px) scale(0.985);
             transform-origin: center bottom;
-            transition: opacity 0.2s var(--nexus-ease-ui), transform 0.2s var(--nexus-ease-ui);
+            transition: opacity 0.2s var(--nodus-ease-ui), transform 0.2s var(--nodus-ease-ui);
             z-index: 40;
         }
 
@@ -420,8 +420,8 @@
         class="absolute w-full z-20 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-gutter mx-auto top-0 left-0 right-0">
         <a href="index.html"
             class="font-label-code text-label-code opacity-70 tracking-widest text-on-surface hover:opacity-100 transition-opacity duration-300 ml-4 mt-2"
-            style="text-decoration:none;color:inherit;line-height:1.35" aria-label="Nexus home">
-            NEXUS
+            style="text-decoration:none;color:inherit;line-height:1.35" aria-label="Nodus home">
+            NODUS
             <span style="display:block;font-size:8px;letter-spacing:0.18em;opacity:0.42;margin-top:2px">DEEP FIELD
                 SURVEY</span>
         </a>
@@ -540,7 +540,7 @@
         class="absolute w-full z-20 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-gutter bottom-0 left-0 right-0 pointer-events-none">
         <div id="footerCopy"
             class="font-label-code text-label-code text-on-surface-variant opacity-40 mb-2 ml-4 hidden md:block">
-            &copy; <span id="copyright-year"></span> NEXUS. EXPLORE THE INFINITE.
+            &copy; <span id="copyright-year"></span> NODUS. EXPLORE THE INFINITE.
         </div>
         <div class="pointer-events-auto mb-2 mx-auto md:absolute md:left-1/2 md:-translate-x-1/2">
             <nav class="footer-nav font-label-code text-label-code" aria-label="Primary page navigation">
@@ -559,7 +559,7 @@
         }
 
         // ─── Domain Colors ───────────────────────────────────────────────
-        const DOMAIN_COLORS = window.NexusTokens?.DOMAIN_COLORS || {
+        const DOMAIN_COLORS = window.NodusTokens?.DOMAIN_COLORS || {
             MAT: '#5b9bd5', PHY: '#c97a5b', CHE: '#c9c05b',
             BIO: '#5bc97a', MED: '#5bc9b8', ENG: '#9b7bc9',
             TEC: '#c95b9b', SOC: '#c9a05a', HUM: '#7ba5c9',
@@ -577,7 +577,7 @@
         let allNodes = [];
         let searchIndex = [];
         let i18n = null;
-        let lang = normalizeLang(localStorage.getItem('nexus-lang'));
+        let lang = normalizeLang(localStorage.getItem('nodus-lang'));
         let activeIndex = -1;
 
         function normalizeLang(value) {
@@ -615,7 +615,7 @@
         let touchTooltipButton = null;
 
         function prefersTouchTooltipMode() {
-            return window.__NEXUS_FORCE_TOUCH_TOOLTIP__ === true ||
+            return window.__NODUS_FORCE_TOUCH_TOOLTIP__ === true ||
                 window.matchMedia('(pointer: coarse)').matches ||
                 navigator.maxTouchPoints > 0;
         }
@@ -663,7 +663,7 @@
         async function loadData() {
             try {
                 let data;
-                const cacheKey = 'nexus:index:graph:v1';
+                const cacheKey = 'nodus:index:graph:v1';
                 try {
                     const cachedRaw = sessionStorage.getItem(cacheKey);
                     if (cachedRaw) {
@@ -949,7 +949,7 @@
         async function setLang(nextLang) {
             if (!SUPPORTED_LANGS.includes(nextLang) || nextLang === lang) return;
             lang = nextLang;
-            localStorage.setItem('nexus-lang', lang);
+            localStorage.setItem('nodus-lang', lang);
             document.documentElement.lang = htmlLang(lang);
             await loadI18n(lang);
             applyLang();
@@ -990,7 +990,7 @@
                     ctaExplore: 'Start Exploring Graph',
                     ctaSearch: 'Search Directly',
                     placeholder: 'Explore the infinite...',
-                    footerCopy: `© ${new Date().getFullYear()} NEXUS. EXPLORE THE INFINITE.`,
+                    footerCopy: `© ${new Date().getFullYear()} NODUS. EXPLORE THE INFINITE.`,
                     footerGraph: 'Graph',
                     footerExplorer: 'Explorer',
                 },
@@ -1001,7 +1001,7 @@
                     ctaExplore: '開始探索圖譜',
                     ctaSearch: '直接搜尋',
                     placeholder: '探索無限知識…',
-                    footerCopy: `© ${new Date().getFullYear()} NEXUS．探索無限知識。`,
+                    footerCopy: `© ${new Date().getFullYear()} NODUS．探索無限知識。`,
                     footerGraph: '圖譜',
                     footerExplorer: '探索器',
                 },
@@ -1012,7 +1012,7 @@
                     ctaExplore: 'グラフ探索を開始',
                     ctaSearch: 'すぐ検索',
                     placeholder: '無限の知識を探索…',
-                    footerCopy: `© ${new Date().getFullYear()} NEXUS. 知のつながりを探索する。`,
+                    footerCopy: `© ${new Date().getFullYear()} NODUS. 知のつながりを探索する。`,
                     footerGraph: 'グラフ',
                     footerExplorer: 'エクスプローラー',
                 }
@@ -1132,7 +1132,7 @@
 
         // ─── Init ────────────────────────────────────────────────────────
         document.documentElement.lang = htmlLang(lang);
-        localStorage.setItem('nexus-lang', lang);
+        localStorage.setItem('nodus-lang', lang);
         Promise.all([loadData(), loadI18n(lang)]).then(() => {
             applyLang();
         });

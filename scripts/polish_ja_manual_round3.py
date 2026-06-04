@@ -1,7 +1,7 @@
-﻿import json
+import json
 from pathlib import Path
 
-ja_path = Path('d:/Code_Space/Nexus/data/i18n/ja.json')
+ja_path = Path('d:/Code_Space/Nodus/data/i18n/ja.json')
 ja = json.loads(ja_path.read_text(encoding='utf-8'))
 
 # Phrase-level normalization to more natural Japanese terms.

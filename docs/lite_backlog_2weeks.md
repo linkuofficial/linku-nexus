@@ -1,4 +1,4 @@
-# Nexus Lite Backlog (2 Weeks)
+# Nodus Lite Backlog (2 Weeks)
 
 ## Week 1
 

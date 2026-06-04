@@ -1,5 +1,5 @@
 {
-  "name": "nexus",
+  "name": "nodus",
   "version": "1.0.0",
   "description": "Cross-domain knowledge graph generation and exploration platform",
   "type": "module",
@@ -7,14 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "backend": "uvicorn backend.main:app --reload --port 8000",
-    "start": "concurrently \"npm run backend\" \"npm run dev\"",
-    "prod": "npm run build && uvicorn backend.main:app --host 0.0.0.0 --port 8000",
-    "smoke:notify": "powershell -ExecutionPolicy Bypass -File scripts/smoke_notifications.ps1",
-    "rollback": "powershell -ExecutionPolicy Bypass -File scripts/rollback.ps1",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install --with-deps chromium",
-    "test:contract": "python -m pytest tests/test_api_contract.py -q"
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "keywords": [
     "knowledge-graph",
@@ -25,6 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.1",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
@@ -32,7 +27,6 @@
     "vite": "^8.0.14"
   },
   "dependencies": {
-    "@types/node": "^25.9.1",
     "d3": "^7.9.0"
   }
 }

@@ -6,7 +6,7 @@
     <script>
         (function () {
             try {
-                let lang = localStorage.getItem('nexus-lang') || 'en';
+                let lang = localStorage.getItem('nodus-lang') || 'en';
                 if (lang === 'zh-TW') lang = 'zh';
                 document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : (lang === 'ja' ? 'ja' : 'en');
             } catch (e) {
@@ -16,23 +16,23 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Explore the Nexus knowledge graph with prerequisites, connections, and multilingual learning paths.">
-    <meta property="og:title" content="Nexus Knowledge Graph">
+        content="Explore the Nodus knowledge graph with prerequisites, connections, and multilingual learning paths.">
+    <meta property="og:title" content="Nodus Knowledge Graph">
     <meta property="og:description"
         content="Explore connected concepts, people, and events with guided learning paths.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/favicon.svg">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Nexus Knowledge Graph">
+    <meta name="twitter:title" content="Nodus Knowledge Graph">
     <meta name="twitter:description"
         content="Explore connected concepts, people, and events with guided learning paths.">
     <meta name="twitter:image" content="/favicon.svg">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preload" href="/vendor/d3.min.js" as="script">
     <link rel="preload" href="/api/graph/full" as="fetch" crossorigin>
-    <title>Knowledge Graph — Nexus</title>
+    <title>Knowledge Graph — Nodus</title>
     <script src="/vendor/d3.min.js" defer></script>
-    <link rel="stylesheet" href="/nexus-theme.css">
+    <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="src/shared.css">
     <style>
         :root {
@@ -49,13 +49,13 @@
             --panel-ink: #334155;
             --panel-soft: #64748b;
             --panel-faint: #94a3b8;
-            --accent: var(--nexus-accent);
-            --radius-sm: var(--nexus-radius-sm);
-            --radius-md: var(--nexus-radius-md);
-            --radius-lg: var(--nexus-radius-lg);
-            --shadow-soft: var(--nexus-shadow-soft);
-            --shadow-strong: var(--nexus-shadow-strong);
-            --ease-ui: var(--nexus-ease-ui);
+            --accent: var(--nodus-accent);
+            --radius-sm: var(--nodus-radius-sm);
+            --radius-md: var(--nodus-radius-md);
+            --radius-lg: var(--nodus-radius-lg);
+            --shadow-soft: var(--nodus-shadow-soft);
+            --shadow-strong: var(--nodus-shadow-strong);
+            --ease-ui: var(--nodus-ease-ui);
             --panel-desktop-width: 332px;
         }
 
@@ -1461,7 +1461,7 @@
         </div>
     </div>
     <div id="hdr">
-        <a id="home-link" href="index.html">&larr; NEXUS</a>
+        <a id="home-link" href="index.html">&larr; NODUS</a>
         <h1>Knowledge Graph</h1>
         <p id="stats"></p>
         <div id="sim-hint" aria-live="polite" aria-label="Layout stabilizing">
@@ -1544,7 +1544,7 @@
     <script type="module" src="/src/state.js"></script>
     <script type="module" src="/src/api.js"></script>
     <script type="module" src="/src/graph.js"></script>
-    <script src="/nexus-tokens.js"></script>
+    <script src="/nodus-tokens.js"></script>
     <script type="module" src="/src/app-main.js"></script>
 </body>
 

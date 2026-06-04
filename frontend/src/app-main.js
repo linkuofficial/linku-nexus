@@ -79,19 +79,19 @@ function renderPanelDescription(node) {
 async function setLang(lang) {
     if (!isValidLang(lang)) return;
     LANG = lang;
-    localStorage.setItem('nexus-lang', lang);
+    localStorage.setItem('nodus-lang', lang);
     document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : lang;
     // Load/clear label translations
     if (lang !== 'en') {
         try {
-            labelMap = await window.NexusApi.fetchLocaleLabels(lang);
+            labelMap = await window.NodusApi.fetchLocaleLabels(lang);
         } catch (e) { labelMap = {}; }
     } else {
         labelMap = {};
     }
     if (lang !== 'en') {
         try {
-            descriptionMap = await window.NexusApi.fetchLocaleDescriptions(lang);
+            descriptionMap = await window.NodusApi.fetchLocaleDescriptions(lang);
         } catch (e) {
             descriptionMap = {};
         }
@@ -213,8 +213,8 @@ function hideLoadingState() {
 }
 
 // ===== CONSTANTS =====
-const DC = window.NexusTokens?.DOMAIN_COLORS || { MAT: '#5b9bd5', PHY: '#c97a5b', CHE: '#c9c05b', BIO: '#5bc97a', MED: '#5bc9b8', ENG: '#9b7bc9', TEC: '#c95b9b', SOC: '#c9a05a', HUM: '#7ba5c9', PHI: '#9bc95b', ART: '#c95b5b', HIS: '#a07850' };
-const RC = window.NexusTokens?.RELATION_COLORS || { logical: '#5b9bd5', historical: '#c9a05a', applied: '#5bc97a', conceptual: '#9b7bc9', causal: '#c95b5b' };
+const DC = window.NodusTokens?.DOMAIN_COLORS || { MAT: '#5b9bd5', PHY: '#c97a5b', CHE: '#c9c05b', BIO: '#5bc97a', MED: '#5bc9b8', ENG: '#9b7bc9', TEC: '#c95b9b', SOC: '#c9a05a', HUM: '#7ba5c9', PHI: '#9bc95b', ART: '#c95b5b', HIS: '#a07850' };
+const RC = window.NodusTokens?.RELATION_COLORS || { logical: '#5b9bd5', historical: '#c9a05a', applied: '#5bc97a', conceptual: '#9b7bc9', causal: '#c95b5b' };
 const TYPE_SIZE = { field: 16, concept: 6, person: 9, event: 11 };
 
 let allNodes = [], allEdges = [], nodeMap = {}, sim, nodeEls, linkEls, g, svgEl, zoomBehavior;
@@ -238,8 +238,8 @@ const EDGE_CURVE_MIN_OFFSET = 10;
 const EDGE_CURVE_MAX_OFFSET = 42;
 const TOP_CHROME_EXPAND_DELAY = 90;
 const TOP_CHROME_COLLAPSE_DELAY = 260;
-const NAV_HISTORY_STORAGE_KEY = 'nexus-nav-history-v1';
-const APP_ONBOARD_STORAGE_KEY = 'nexus-app-onboard-seen-v1';
+const NAV_HISTORY_STORAGE_KEY = 'nodus-nav-history-v1';
+const APP_ONBOARD_STORAGE_KEY = 'nodus-app-onboard-seen-v1';
 let guideBindingsReady = false;
 let guideStepIndex = 0;
 
@@ -356,27 +356,27 @@ function setupGuides() {
 }
 
 function isSafeNodeId(id) {
-    return window.NexusState.isSafeNodeId(id);
+    return window.NodusState.isSafeNodeId(id);
 }
 
 function parseLearnedSet(rawValue) {
-    return window.NexusState.parseLearnedSet(rawValue, nodeMap);
+    return window.NodusState.parseLearnedSet(rawValue, nodeMap);
 }
 
 function normalizeGraphData(data) {
-    return window.NexusApi.normalizeGraphData(data);
+    return window.NodusApi.normalizeGraphData(data);
 }
 
 function sleep(ms) {
-    return window.NexusApi.sleep(ms);
+    return window.NodusApi.sleep(ms);
 }
 
 async function fetchJsonWithRetry(url, retries = 2) {
-    return window.NexusApi.fetchJsonWithRetry(url, retries);
+    return window.NodusApi.fetchJsonWithRetry(url, retries);
 }
 
 async function loadGraphData() {
-    return window.NexusApi.loadGraphData();
+    return window.NodusApi.loadGraphData();
 }
 
 function nodeLabel(n) {
@@ -452,12 +452,12 @@ async function init() {
     // Load translations if not English
     if (LANG !== 'en') {
         try {
-            labelMap = await window.NexusApi.fetchLocaleLabels(LANG);
+            labelMap = await window.NodusApi.fetchLocaleLabels(LANG);
         } catch (e) { /* fallback to English labels */ }
     }
     if (LANG !== 'en') {
         try {
-            descriptionMap = await window.NexusApi.fetchLocaleDescriptions(LANG);
+            descriptionMap = await window.NodusApi.fetchLocaleDescriptions(LANG);
         } catch (e) {
             descriptionMap = {};
         }
@@ -470,7 +470,7 @@ async function init() {
         setLoadingState(t('loadingGraph'));
         const [graphResult, descResult] = await Promise.all([
             loadGraphData(),
-            window.NexusApi.fetchGraphDescriptions(),
+            window.NodusApi.fetchGraphDescriptions(),
         ]);
         data = graphResult;
         enDescriptionMap = descResult;
@@ -644,7 +644,7 @@ function setupTopChrome() {
 }
 
 function buildPrereqGraph(raw) {
-    const built = window.NexusGraph.buildPrerequisiteGraph(raw, nodeMap);
+    const built = window.NodusGraph.buildPrerequisiteGraph(raw, nodeMap);
     prereqEdges = built.prereqEdges;
     prereqGraph = built.prereqGraph;
 }
@@ -906,7 +906,7 @@ function buildGraph() {
     const _linkElArr = linkNodeRefs;
 
     // Allow localStorage override: 'low' forces perf-mode, 'high' disables it
-    const _perfOverride = (() => { try { return localStorage.getItem('nexus-perf'); } catch { return null; } })();
+    const _perfOverride = (() => { try { return localStorage.getItem('nodus-perf'); } catch { return null; } })();
 
     // Viewport culling state
     let _visibleNodes = new Uint8Array(allNodes.length); // 1 = visible
@@ -1383,17 +1383,17 @@ function toggleLearned(id) {
 // --- Learning Progress Persistence ---
 async function loadLearningProgress() {
     // Prefer local state as baseline, then merge server state when available.
-    const localLearned = window.NexusState.loadStoredLearned('nexus-learned', nodeMap);
+    const localLearned = window.NodusState.loadStoredLearned('nodus-learned', nodeMap);
     learnedSet = new Set(localLearned);
 
     try {
-        const data = await window.NexusApi.fetchLearningProgress();
+        const data = await window.NodusApi.fetchLearningProgress();
         if (data) {
             const serverLearned = (data.learned || []).filter(id => isSafeNodeId(id) && nodeMap[id]);
             for (const id of serverLearned) {
                 learnedSet.add(id);
             }
-            window.NexusState.saveStoredLearned('nexus-learned', learnedSet);
+            window.NodusState.saveStoredLearned('nodus-learned', learnedSet);
             return;
         }
     } catch (e) { /* API unavailable */ }
@@ -1402,10 +1402,10 @@ async function loadLearningProgress() {
 function saveLearningProgress(toggledId) {
     // Save to localStorage immediately
     try {
-        window.NexusState.saveStoredLearned('nexus-learned', learnedSet);
+        window.NodusState.saveStoredLearned('nodus-learned', learnedSet);
     } catch (e) { }
     // Sync to backend (fire-and-forget)
-    window.NexusApi.postLearningToggle(toggledId).catch(() => { });
+    window.NodusApi.postLearningToggle(toggledId).catch(() => { });
 }
 
 function isAvailable(id) {

@@ -1,4 +1,4 @@
-# Nexus Current Status Candidate (2026-05-25)
+# Nodus Current Status Candidate (2026-05-25)
 
 > 這是「目前狀態候補檔」，用於在正式更新 `current_status_*.md` 前先追蹤當前真實狀態與待確認事項。
 

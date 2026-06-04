@@ -1,5 +1,5 @@
-(function initNexusApi(globalObj) {
-    const CACHE_PREFIX = "nexus:api:";
+(function initNodusApi(globalObj) {
+    const CACHE_PREFIX = "nodus:api:";
     const CACHE_TTL_MS = {
         graphFull: 5 * 60 * 1000,
         descriptions: 5 * 60 * 1000,
@@ -121,49 +121,23 @@
 
     async function loadGraphData() {
         return dedupedCachedFetch("graph-full", CACHE_TTL_MS.graphFull, async () => {
-            try {
-                const apiData = await fetchJsonWithRetry("/api/graph/full", 2);
-                return normalizeGraphData(apiData);
-            } catch (apiError) {
-                const fileData = await fetchJsonWithRetry("../data/all_nodes.json", 1);
-                return normalizeGraphData(fileData);
-            }
+            const fileData = await fetchJsonWithRetry("/data/all_nodes.json", 2);
+            return normalizeGraphData(fileData);
         });
     }
 
     async function fetchGraphDescriptions() {
-        return dedupedCachedFetch("graph-descriptions", CACHE_TTL_MS.descriptions, async () => {
-            try {
-                const data = await fetchJsonWithRetry("/api/graph/descriptions", 1);
-                return data || {};
-            } catch (e) {
-                return {};
-            }
-        });
+        // Descriptions are embedded in each node's .description field from all_nodes.json.
+        return {};
     }
 
     async function fetchLocaleLabels(locale) {
         const targetLocale = locale || "en";
         return dedupedCachedFetch(`labels:${targetLocale}`, CACHE_TTL_MS.localeLabels, async () => {
-            try {
-                const primary = await fetch(`/api/i18n/${encodeURIComponent(targetLocale)}`);
-                if (primary.ok) {
-                    return await primary.json();
-                }
-            } catch (error) {
-                // Fall through to static fallback.
-            }
-
-            const fallback = await fetch(`../data/i18n/${encodeURIComponent(targetLocale)}.json`);
-            if (fallback.ok) {
-                return await fallback.json();
-            }
-
-            // Final safety net: if locale-specific assets are missing, use English labels.
-            const english = await fetch(`../data/i18n/en.json`);
-            if (english.ok) {
-                return await english.json();
-            }
+            const primary = await fetch(`/data/i18n/${encodeURIComponent(targetLocale)}.json`);
+            if (primary.ok) return primary.json();
+            const english = await fetch(`/data/i18n/en.json`);
+            if (english.ok) return english.json();
             return {};
         });
     }
@@ -173,33 +147,14 @@
             return {};
         }
         return dedupedCachedFetch(`descriptions:${locale}`, CACHE_TTL_MS.localeDescriptions, async () => {
-            try {
-                const primary = await fetch(`/api/i18n/${encodeURIComponent(locale)}/descriptions`);
-                if (primary.ok) {
-                    const payload = await primary.json();
-                    if (payload && typeof payload === "object") {
-                        if (payload.descriptions && typeof payload.descriptions === "object") {
-                            return payload.descriptions;
-                        }
-                        return payload;
-                    }
-                }
-            } catch (error) {
-                // Fall through to static fallback.
-            }
-
-            // Description batches are currently file-based (no API route yet).
             const fileCandidates = [
-                `../data/i18n/${encodeURIComponent(locale)}_descriptions.json`,
-                `../data/i18n/${encodeURIComponent(locale)}_descriptions_batch1.json`,
+                `/data/i18n/${encodeURIComponent(locale)}_descriptions.json`,
+                `/data/i18n/${encodeURIComponent(locale)}_descriptions_batch1.json`,
             ];
-
             for (const path of fileCandidates) {
                 try {
                     const response = await fetch(path);
-                    if (!response.ok) {
-                        continue;
-                    }
+                    if (!response.ok) continue;
                     const payload = await response.json();
                     if (payload && typeof payload === "object") {
                         if (payload.descriptions && typeof payload.descriptions === "object") {
@@ -211,26 +166,21 @@
                     // Continue to next candidate.
                 }
             }
-
             return {};
         });
     }
 
     async function fetchLearningProgress() {
-        const response = await fetch("/api/learning-path/progress");
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
+        // Progress is stored in localStorage only — no backend sync.
+        return null;
     }
 
     function postLearningToggle(nodeId) {
-        return fetch(`/api/learning-path/progress/toggle/${encodeURIComponent(nodeId)}`, {
-            method: "POST",
-        });
+        // No backend — progress persists via localStorage only.
+        return Promise.resolve();
     }
 
-    globalObj.NexusApi = {
+    globalObj.NodusApi = {
         sleep,
         normalizeGraphData,
         fetchJsonWithRetry,

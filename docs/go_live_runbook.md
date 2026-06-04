@@ -1,10 +1,10 @@
-# Nexus Go-Live Runbook
+# Nodus Go-Live Runbook
 
 更新日期：2026-05-24
 
 ## 1. 部署目標
 
-- 服務：Nexus FastAPI + built frontend
+- 服務：Nodus FastAPI + built frontend
 - 入口健康檢查：/api/health
 - Metrics：/api/metrics
 - 策略：基本監控 + 單一通知通道，不建立正式值班制度
@@ -19,7 +19,7 @@
 ## 3. 部署步驟
 
 1. 拉取最新主分支並確認 commit。
-2. 建立映像：docker build -t nexus:<release-tag> .
+2. 建立映像：docker build -t nodus:<release-tag> .
 3. 設定 production secrets 與 env。
 4. 啟動新版本容器（或滾動更新）。
 5. 執行健康檢查與 smoke 驗證。
@@ -28,10 +28,10 @@
 
 - GET /api/health 回傳 200。
 - GET /api/metrics 可讀取，且包含：
-  - nexus_http_requests_total
-  - nexus_http_5xx_total
-  - nexus_http_latency_p95_ms
-  - nexus_admin_trigger_events
+  - nodus_http_requests_total
+  - nodus_http_5xx_total
+  - nodus_http_latency_p95_ms
+  - nodus_admin_trigger_events
 - 前端首頁與圖譜頁可正常載入。
 
 ## 5. 核心告警規則（初版）
@@ -47,7 +47,7 @@
 - 行動：檢查 Neo4j 連線與查詢熱點
 
 3. Admin trigger burst
-- 條件：nexus_admin_trigger_events{window="minute"} 超過閾值
+- 條件：nodus_admin_trigger_events{window="minute"} 超過閾值
 - 行動：檢查是否誤觸發或濫用，必要時旋轉 ADMIN_API_KEY
 
 4. Neo4j 連線異常
@@ -64,7 +64,7 @@
 - 連續 10 分鐘健康檢查不穩定，或關鍵功能不可用。
 
 2. 執行回滾
-- 切回上一版穩定映像 nexus:<previous-tag>。
+- 切回上一版穩定映像 nodus:<previous-tag>。
 - 重啟服務並再次驗證 /api/health 與前端核心流程。
 
 3. 回滾後處理

@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory = $false)]
     [string]$Image = "",
-    [string]$Container = "nexus",
+    [string]$Container = "nodus",
     [int]$Port = 8000,
     [Alias("env-file")]
     [string]$EnvFile = ".env",

@@ -1,12 +1,12 @@
 # Verification Runbook
 
-此文件用於快速確認 Nexus 專案在本機是否處於可交付狀態。
+此文件用於快速確認 Nodus 專案在本機是否處於可交付狀態。
 
 ## 1. Python tests
 
 Command:
 
-d:/Code_Space/Nexus/.venv/Scripts/python.exe -m pytest
+d:/Code_Space/Nodus/.venv/Scripts/python.exe -m pytest
 
 Expected:
 - 結果含 48 passed
@@ -26,11 +26,11 @@ Expected:
 
 先啟動 API：
 
-d:/Code_Space/Nexus/.venv/Scripts/python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+d:/Code_Space/Nodus/.venv/Scripts/python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 
 再執行：
 
-d:/Code_Space/Nexus/.venv/Scripts/python.exe -m pytest tests/test_api_integration.py -q
+d:/Code_Space/Nodus/.venv/Scripts/python.exe -m pytest tests/test_api_integration.py -q
 
 Expected:
 - test_api_integration pass
@@ -71,7 +71,7 @@ Expected:
 
 Command:
 
-d:/LINKU/Nexus/.venv/Scripts/python.exe scripts/baseline_report.py
+d:/LINKU/Nodus/.venv/Scripts/python.exe scripts/baseline_report.py
 
 Expected:
 - 在 `docs/baselines/` 產生 timestamped JSON/MD
@@ -82,7 +82,7 @@ Expected:
 
 Command:
 
-d:/LINKU/Nexus/.venv/Scripts/python.exe scripts/wave_gate_runner.py --run-tests
+d:/LINKU/Nodus/.venv/Scripts/python.exe scripts/wave_gate_runner.py --run-tests
 
 Expected:
 - 終端顯示 `wave_gate_overall: pass`
@@ -91,4 +91,4 @@ Expected:
 
 Optional benchmark gate:
 
-d:/LINKU/Nexus/.venv/Scripts/python.exe scripts/wave_gate_runner.py --run-tests --benchmark-current docs/benchmarks/latest.json --benchmark-baseline docs/benchmarks/baseline.json
+d:/LINKU/Nodus/.venv/Scripts/python.exe scripts/wave_gate_runner.py --run-tests --benchmark-current docs/benchmarks/latest.json --benchmark-baseline docs/benchmarks/baseline.json

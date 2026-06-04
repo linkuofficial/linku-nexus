@@ -75,7 +75,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-from nexus_utils import word_count  # noqa: E402
+from nodus_utils import word_count  # noqa: E402
 
 
 def build_selection_pool(nodes: list[dict[str, Any]], domain: str | None, max_desc_score: int, max_total_score: int) -> list[dict[str, Any]]:

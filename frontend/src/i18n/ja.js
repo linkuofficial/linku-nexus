@@ -1,4 +1,4 @@
-/** Japanese (日本語) translations for the Nexus Knowledge Graph UI. */
+/** Japanese (日本語) translations for the Nodus Knowledge Graph UI. */
 export default {
     title: '\u30ca\u30ec\u30c3\u30b8\u30b0\u30e9\u30d5',
     loading: '\u30b0\u30e9\u30d5\u3092\u8aad\u307f\u8fbc\u307f\u4e2d...',

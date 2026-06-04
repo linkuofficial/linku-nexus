@@ -37,7 +37,7 @@ CONFIG = load_config()
 NODES_FILE = BASE_DIR / CONFIG["paths"]["nodes_file"]
 FIELD_NODES_FILE = BASE_DIR / CONFIG["paths"]["field_nodes_file"]
 
-from nexus_utils import VALID_DOMAINS
+from nodus_utils import VALID_DOMAINS
 
 # Domain 關鍵詞映射（用於偵測 BRIDGE 是否真正跨域）
 DOMAIN_KEYWORDS = {

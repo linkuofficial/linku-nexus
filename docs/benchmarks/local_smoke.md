@@ -1,4 +1,4 @@
-# Nexus API Benchmark
+# Nodus API Benchmark
 
 - timestamp: 2026-05-24T11:21:37.816482+00:00
 - base_url: http://127.0.0.1:8000

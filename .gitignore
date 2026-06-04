@@ -10,6 +10,9 @@ __pycache__/
 .env.production
 .vite/
 
+# Data files copied to public at build time (derived from data/)
+frontend/public/data/
+
 # IDE
 .vscode/
 .idea/

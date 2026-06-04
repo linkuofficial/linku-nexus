@@ -18,7 +18,7 @@ export function isValidLang(lang) {
 
 /** Resolve the preferred locale from localStorage / navigator. */
 export function getLang() {
-    const saved = localStorage.getItem('nexus-lang');
+    const saved = localStorage.getItem('nodus-lang');
     if (saved === 'zh-TW') return 'zh';
     if (isValidLang(saved)) return saved;
     const nav = (navigator.language || '').toLowerCase();

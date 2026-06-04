@@ -1,7 +1,7 @@
-﻿import json
+import json
 from pathlib import Path
 
-root = Path('d:/Code_Space/Nexus')
+root = Path('d:/Code_Space/Nodus')
 i18n = root / 'data' / 'i18n'
 
 zh = json.loads((i18n / 'zh.json').read_text(encoding='utf-8'))

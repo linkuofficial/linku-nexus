@@ -1,4 +1,4 @@
-# Nexus Production Preflight for Chrome Claude (2026-05-27)
+# Nodus Production Preflight for Chrome Claude (2026-05-27)
 
 ## A. Completed Today (Verified)
 
@@ -46,10 +46,10 @@
 ## C. Deploy Commands (Reference)
 
 1. Build image
-- docker build -t nexus:<release-tag> .
+- docker build -t nodus:<release-tag> .
 
 2. Run container
-- docker run --name nexus -p 8000:8000 --env-file .env -d nexus:<release-tag>
+- docker run --name nodus -p 8000:8000 --env-file .env -d nodus:<release-tag>
 
 3. Health checks
 - GET /api/health returns 200

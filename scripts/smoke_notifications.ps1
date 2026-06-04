@@ -29,9 +29,9 @@ Assert-True ($metrics.StatusCode -eq 200) "Metrics endpoint failed: expected sta
 $metricsBody = $metrics.Content
 
 foreach ($required in @(
-    "nexus_http_5xx_total",
-    "nexus_http_latency_p95_ms",
-    "nexus_admin_trigger_events"
+    "nodus_http_5xx_total",
+    "nodus_http_latency_p95_ms",
+    "nodus_admin_trigger_events"
 )) {
     Assert-True ($metricsBody.Contains($required)) "Metrics missing required key: $required"
 }
@@ -58,7 +58,7 @@ try {
     Assert-True ($trigger.StatusCode -eq 200) "Admin trigger failed: expected status 200, got $($trigger.StatusCode)"
 
     $metricsAfter = Invoke-WebRequest -UseBasicParsing -Method GET -Uri "$BaseUrl/api/metrics"
-    $minuteLine = ($metricsAfter.Content -split "`n" | Where-Object { $_ -match 'nexus_admin_trigger_events\{window="minute"\}' } | Select-Object -First 1)
+    $minuteLine = ($metricsAfter.Content -split "`n" | Where-Object { $_ -match 'nodus_admin_trigger_events\{window="minute"\}' } | Select-Object -First 1)
     Assert-True (-not [string]::IsNullOrWhiteSpace($minuteLine)) "Missing minute admin trigger metric"
 
     $minuteMatch = [regex]::Match($minuteLine, '(\d+)$')
@@ -101,7 +101,7 @@ catch {
 
 # 4) Optional webhook reachability check
 if (-not [string]::IsNullOrWhiteSpace($WebhookUrl)) {
-    $probe = @{ text = "nexus smoke notification $(Get-Date -Format o)" } | ConvertTo-Json
+    $probe = @{ text = "nodus smoke notification $(Get-Date -Format o)" } | ConvertTo-Json
     $hook = Invoke-WebRequest -UseBasicParsing -Method POST -Uri $WebhookUrl -ContentType "application/json" -Body $probe
     Assert-True ($hook.StatusCode -ge 200 -and $hook.StatusCode -lt 300) "Webhook probe failed: status $($hook.StatusCode)"
     Write-Output "[smoke] webhook_probe_status=$($hook.StatusCode)"

@@ -1,4 +1,4 @@
-(function initNexusState(globalObj) {
+(function initNodusState(globalObj) {
     const SAFE_NODE_ID_RE = /^[A-Za-z0-9._:-]{1,120}$/;
 
     function isSafeNodeId(id) {
@@ -29,7 +29,7 @@
         localStorage.setItem(storageKey, JSON.stringify([...valuesSet]));
     }
 
-    globalObj.NexusState = {
+    globalObj.NodusState = {
         isSafeNodeId,
         parseLearnedSet,
         loadStoredLearned,

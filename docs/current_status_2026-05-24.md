@@ -1,4 +1,4 @@
-# Nexus Current Status (2026-05-24)
+# Nodus Current Status (2026-05-24)
 
 ## 1. 本次已完成的重點
 

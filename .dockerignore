@@ -1,4 +1,4 @@
-# Nexus Docker ignore
+# Nodus Docker ignore
 node_modules/
 dist/
 __pycache__/

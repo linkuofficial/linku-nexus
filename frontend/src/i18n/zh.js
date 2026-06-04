@@ -1,4 +1,4 @@
-/** Traditional Chinese (繁體中文) translations for the Nexus Knowledge Graph UI. */
+/** Traditional Chinese (繁體中文) translations for the Nodus Knowledge Graph UI. */
 export default {
     title: '\u77e5\u8b58\u5716\u8b5c',
     loading: '\u8f09\u5165\u5716\u8b5c\u4e2d...',

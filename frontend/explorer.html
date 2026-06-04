@@ -6,7 +6,7 @@
     <script>
         (function () {
             try {
-                let lang = localStorage.getItem('nexus-lang') || 'en';
+                let lang = localStorage.getItem('nodus-lang') || 'en';
                 if (lang === 'zh-TW') lang = 'zh';
                 document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : (lang === 'ja' ? 'ja' : 'en');
             } catch (e) {
@@ -16,23 +16,23 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Explore Nexus in progressive focus mode to discover concept connections step by step.">
-    <meta property="og:title" content="Nexus Explorer">
+        content="Explore Nodus in progressive focus mode to discover concept connections step by step.">
+    <meta property="og:title" content="Nodus Explorer">
     <meta property="og:description"
         content="Navigate the knowledge graph with guided expansion, focus modes, and multilingual labels.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/favicon.svg">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Nexus Explorer">
+    <meta name="twitter:title" content="Nodus Explorer">
     <meta name="twitter:description"
         content="Navigate the knowledge graph with guided expansion, focus modes, and multilingual labels.">
     <meta name="twitter:image" content="/favicon.svg">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preload" href="/vendor/d3.min.js" as="script">
     <link rel="preload" href="/api/graph/full" as="fetch" crossorigin>
-    <title>Nexus — Explorer</title>
+    <title>Nodus — Explorer</title>
     <script src="/vendor/d3.min.js"></script>
-    <link rel="stylesheet" href="/nexus-theme.css">
+    <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="src/shared.css">
     <style>
         :root {
@@ -49,13 +49,13 @@
             --panel-ink: #2d3d52;
             --panel-soft: #5a6d84;
             --panel-faint: #8a9bb2;
-            --accent: var(--nexus-accent);
-            --radius-sm: var(--nexus-radius-sm);
-            --radius-md: var(--nexus-radius-md);
-            --radius-lg: var(--nexus-radius-lg);
-            --shadow-soft: var(--nexus-shadow-soft);
-            --shadow-strong: var(--nexus-shadow-strong);
-            --ease-ui: var(--nexus-ease-ui);
+            --accent: var(--nodus-accent);
+            --radius-sm: var(--nodus-radius-sm);
+            --radius-md: var(--nodus-radius-md);
+            --radius-lg: var(--nodus-radius-lg);
+            --shadow-soft: var(--nodus-shadow-soft);
+            --shadow-strong: var(--nodus-shadow-strong);
+            --ease-ui: var(--nodus-ease-ui);
         }
 
         * {
@@ -1677,7 +1677,7 @@
             <span class="hdr-nav-sep" aria-hidden="true">/</span>
             <a id="hdr-graph-link" href="app.html">Graph</a>
         </div>
-        <h1 id="hdr-title">Nexus Explorer</h1>
+        <h1 id="hdr-title">Nodus Explorer</h1>
         <p id="hdr-subtitle">Knowledge Graph</p>
     </div>
 
@@ -1822,15 +1822,15 @@
         </div>
     </div>
 
-    <script src="/nexus-tokens.js"></script>
+    <script src="/nodus-tokens.js"></script>
     <script>
         // ===== CONSTANTS =====
-        const DC = window.NexusTokens?.DOMAIN_COLORS || {
+        const DC = window.NodusTokens?.DOMAIN_COLORS || {
             MAT: '#5b9bd5', PHY: '#c97a5b', CHE: '#c9c05b', BIO: '#5bc97a',
             MED: '#5bc9b8', ENG: '#9b7bc9', TEC: '#c95b9b', SOC: '#c9a05a',
             HUM: '#7ba5c9', PHI: '#9bc95b', ART: '#c95b5b', HIS: '#a07850'
         };
-        const RC = window.NexusTokens?.RELATION_COLORS || {
+        const RC = window.NodusTokens?.RELATION_COLORS || {
             logical: '#5b9bd5', historical: '#c9a05a', applied: '#5bc97a',
             conceptual: '#9b7bc9', causal: '#c95b5b'
         };
@@ -1839,7 +1839,7 @@
             en: {
                 navHome: 'Home',
                 navGraph: 'Graph',
-                hdrTitle: 'Nexus Explorer',
+                hdrTitle: 'Nodus Explorer',
                 hdrSubtitle: 'Knowledge Graph',
                 all: 'ALL',
                 searchPlaceholder: 'Search a concept to start exploring...',
@@ -1912,7 +1912,7 @@
             zh: {
                 navHome: '首頁',
                 navGraph: '圖譜',
-                hdrTitle: 'Nexus \u63a2\u7d22\u5668',
+                hdrTitle: 'Nodus \u63a2\u7d22\u5668',
                 hdrSubtitle: '\u77e5\u8b58\u5716\u8b5c',
                 all: '\u5168\u90e8',
                 searchPlaceholder: '\u641c\u5c0b\u6982\u5ff5\u4f86\u958b\u59cb\u63a2\u7d22...',
@@ -1985,7 +1985,7 @@
             ja: {
                 navHome: 'ホーム',
                 navGraph: 'グラフ',
-                hdrTitle: 'Nexus \u30a8\u30af\u30b9\u30d7\u30ed\u30fc\u30e9\u30fc',
+                hdrTitle: 'Nodus \u30a8\u30af\u30b9\u30d7\u30ed\u30fc\u30e9\u30fc',
                 hdrSubtitle: '\u77e5\u8b58\u30b0\u30e9\u30d5',
                 all: '\u3059\u3079\u3066',
                 searchPlaceholder: '\u63a2\u7d22\u3092\u59cb\u3081\u308b\u6982\u5ff5\u3092\u691c\u7d22...',
@@ -2092,7 +2092,7 @@
         const TOP_CHROME_EXPAND_DELAY = 90;
         const TOP_CHROME_COLLAPSE_DELAY = 260;
 
-        const TOUR_KEY = 'nexus-explorer-tour-v1';
+        const TOUR_KEY = 'nodus-explorer-tour-v1';
 
         function getTourSteps() {
             return [
@@ -2372,7 +2372,7 @@
         }
 
         function getLang() {
-            const saved = localStorage.getItem('nexus-lang');
+            const saved = localStorage.getItem('nodus-lang');
             if (saved === 'zh-TW') return 'zh';
             if (saved && saved.toLowerCase() === 'ja-jp') return 'ja';
             if (isValidLang(saved)) return saved;
@@ -2812,7 +2812,7 @@
         async function setLang(lang) {
             if (!isValidLang(lang)) return;
             LANG = lang;
-            localStorage.setItem('nexus-lang', lang);
+            localStorage.setItem('nodus-lang', lang);
             document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : lang;
 
             const requestSeq = ++localeLoadSeq;
@@ -4381,7 +4381,7 @@
         }
 
         // ===== PERSISTENCE =====
-        const STORAGE_KEY = 'nexus-explorer-state';
+        const STORAGE_KEY = 'nodus-explorer-state';
 
         function saveState() {
             try {

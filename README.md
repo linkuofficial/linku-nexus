@@ -1,12 +1,12 @@
-# Nexus
+# Nodus
 
-Nexus 是一個跨領域知識圖譜平台，包含資料生成與治理腳本、FastAPI 後端，以及前端探索介面。
+Nodus 是一個跨領域知識圖譜平台，包含資料生成與治理腳本、FastAPI 後端，以及前端探索介面。
 
 ## 1. 先看這裡（交接入口）
 
 - [docs/chrome_claude_report_archive_2026-05-28.md](docs/chrome_claude_report_archive_2026-05-28.md)：Chrome/Claude 問題清單最終收斂校準與完成狀態。
 - [docs/regression_fix_report_2026-05-28.md](docs/regression_fix_report_2026-05-28.md)：本輪前端已知問題修復、測試補強與驗證結果總結。
-- [docs/go_live_nexus_linku_tech_2026-05-28.md](docs/go_live_nexus_linku_tech_2026-05-28.md)：nexus.linku.tech 正式上線手冊（Fly.io + Cloudflare DNS）。
+- [docs/go_live_nodus_linku_tech_2026-05-28.md](docs/go_live_nodus_linku_tech_2026-05-28.md)：nodus.linku.tech 正式上線手冊（Fly.io + Cloudflare DNS）。
 - [docs/current_status_2026-05-24.md](docs/current_status_2026-05-24.md)：目前已完成項目、風險與下一步。
 - [docs/current_status_candidate_2026-05-25.md](docs/current_status_candidate_2026-05-25.md)：目前狀態候補檔（當日實測與待確認事項）。
 - [docs/verification_runbook.md](docs/verification_runbook.md)：建置、測試、整合驗證標準流程。
@@ -58,8 +58,8 @@ npm run dev
 
 ### 2.4 正式上線與交付前核對
 
-- 正式網址：<https://nexus.linku.tech>
-- 備用網址：<https://nexus-linku.fly.dev>
+- 正式網址：<https://nodus.linku.tech>
+- 備用網址：<https://nodus-linku.fly.dev>
 - 部署平台：Fly.io（nrt / Tokyo）
 
 交付前請先確認以下指令都通過，再進行 `git push`：
@@ -104,7 +104,7 @@ python scripts/enhance_descriptions.py --limit 30 --dry-run
 Nightly alert webhook:
 
 - 設定 repository secret `PERF_ALERT_WEBHOOK`（可對接 Slack/Teams 相容 webhook）。
-- 可在 Actions 手動觸發 `Nexus Nightly Performance` 並開啟 `simulate_failure=true` 進行告警演練。
+- 可在 Actions 手動觸發 `Nodus Nightly Performance` 並開啟 `simulate_failure=true` 進行告警演練。
 
 預期：
 
@@ -115,7 +115,7 @@ Nightly alert webhook:
 ## 4. 專案結構（現行）
 
 ```text
-Nexus/
+Nodus/
 ├── backend/                # FastAPI routers/services/config
 ├── frontend/               # app.html / index.html / explorer.html
 ├── data/                   # all_nodes.json, i18n, batches, reports

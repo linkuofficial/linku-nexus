@@ -94,7 +94,7 @@ def _write_benchmark_reports(output_dir: Path, output_prefix: str, report: dict)
         json.dump(report, f, ensure_ascii=False, indent=2)
 
     lines = [
-        "# Nexus API Benchmark",
+        "# Nodus API Benchmark",
         "",
         f"- timestamp: {report['timestamp']}",
         f"- base_url: {report['base_url']}",
@@ -136,7 +136,7 @@ def _write_benchmark_reports(output_dir: Path, output_prefix: str, report: dict)
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Nexus API load and warm-cache baseline")
+    parser = argparse.ArgumentParser(description="Nodus API load and warm-cache baseline")
     parser.add_argument("--base-url", default="http://127.0.0.1:8000", help="Base API host URL")
     parser.add_argument("--requests", type=int, default=40, help="Requests per scenario")
     parser.add_argument("--concurrency", type=int, default=8, help="Concurrent workers")

@@ -366,6 +366,54 @@ def score_node(node: dict, node_lookup: dict) -> dict:
     }
 
 
+def _run_ci_gates(results: list) -> bool:
+    """Compare current quality against latest_baseline.json gates. Returns True if all gates pass."""
+    import sys
+
+    baseline_path = BASE_DIR / "docs" / "baselines" / "latest_baseline.json"
+    if not baseline_path.exists():
+        print("CI-GATE WARNING: latest_baseline.json not found — skipping gate check")
+        return True
+
+    with open(baseline_path, encoding="utf-8") as f:
+        baseline = json.load(f)
+
+    b_quality = baseline.get("quality", {})
+    b_avg = b_quality.get("avg_total_score", 0)
+    b_dist = b_quality.get("grade_distribution", {})
+    b_low = b_dist.get("D", 0) + b_dist.get("F", 0)
+
+    current_avg = sum(r["total_score"] for r in results) / max(len(results), 1)
+    current_dist = Counter(r["grade"] for r in results)
+    current_low = current_dist.get("D", 0) + current_dist.get("F", 0)
+
+    passed = True
+    print("\nCI QUALITY GATES")
+    print("=" * 50)
+
+    # Gate 1: avg score must not drop more than 1.0 from baseline
+    threshold_avg = max(b_avg - 1.0, 0)
+    status_avg = "PASS" if current_avg >= threshold_avg else "FAIL"
+    if status_avg == "FAIL":
+        passed = False
+    print(f"  Avg score:   {current_avg:.3f}/25  (baseline {b_avg:.3f}, min {threshold_avg:.3f})  [{status_avg}]")
+
+    # Gate 2: D/F node count must not increase by more than 5 from baseline
+    threshold_low = b_low + 5
+    status_low = "PASS" if current_low <= threshold_low else "FAIL"
+    if status_low == "FAIL":
+        passed = False
+    print(f"  D/F nodes:   {current_low}         (baseline {b_low}, max {threshold_low})          [{status_low}]")
+
+    print("=" * 50)
+    if passed:
+        print("CI GATES: ALL PASSED")
+    else:
+        print("CI GATES: FAILED — quality regression detected")
+
+    return passed
+
+
 def main():
     parser = argparse.ArgumentParser(description="Deep quality assessment for knowledge graph nodes")
     parser.add_argument("--domain", type=str, default=None, help="Filter by domain")
@@ -373,6 +421,7 @@ def main():
     parser.add_argument("--min-score", type=int, default=None, help="Only show nodes below this score")
     parser.add_argument("--verbose", action="store_true", help="Show detailed scoring breakdown")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--ci-mode", action="store_true", help="CI gate mode: compare against latest_baseline.json and exit 1 on regression")
     args = parser.parse_args()
     
     nodes = load_nodes()
@@ -468,6 +517,11 @@ def main():
         print("Quality: FAIR — address common issues before batch generation")
     else:
         print("Quality: NEEDS WORK — significant prompt improvements required")
+
+    if args.ci_mode:
+        import sys
+        if not _run_ci_gates(results):
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()

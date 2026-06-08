@@ -226,10 +226,61 @@ def _render_markdown(report: dict[str, Any]) -> str:
     )
 
 
+def _assert_gates(report: dict[str, Any], baseline_path: Path) -> bool:
+    """Compare report against latest_baseline.json. Returns True if all gates pass."""
+    if not baseline_path.exists():
+        print("ASSERT-GATES WARNING: latest_baseline.json not found — skipping")
+        return True
+
+    with open(baseline_path, encoding="utf-8") as f:
+        prev = json.load(f)
+
+    passed = True
+    print("\nBASELINE GATES")
+    print("=" * 50)
+
+    q_now = report["quality"]
+    q_prev = prev.get("quality", {})
+
+    # Gate 1: avg quality score
+    avg_now = q_now["avg_total_score"]
+    avg_prev = q_prev.get("avg_total_score", 0)
+    min_avg = max(avg_prev - 1.0, 0)
+    ok_avg = avg_now >= min_avg
+    if not ok_avg:
+        passed = False
+    print(f"  Avg score:   {avg_now:.3f}/25  (prev {avg_prev:.3f}, min {min_avg:.3f})  [{'PASS' if ok_avg else 'FAIL'}]")
+
+    # Gate 2: validation errors must stay at 0
+    v_now = report["validation"]["error_count"]
+    ok_v = v_now == 0
+    if not ok_v:
+        passed = False
+    print(f"  Errors:      {v_now}         (must be 0)  [{'PASS' if ok_v else 'FAIL'}]")
+
+    # Gate 3: i18n effective coverage must stay at 100% for zh and ja
+    desc_now = report["i18n_descriptions"]["effective_coverage_pct"]
+    for locale in ("zh", "ja"):
+        cov = desc_now.get(locale, 0)
+        ok_cov = cov >= 100.0
+        if not ok_cov:
+            passed = False
+        print(f"  i18n {locale}:     {cov:.1f}%   (must be 100%)  [{'PASS' if ok_cov else 'FAIL'}]")
+
+    print("=" * 50)
+    if passed:
+        print("BASELINE GATES: ALL PASSED")
+    else:
+        print("BASELINE GATES: FAILED")
+
+    return passed
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate baseline report for wave planning")
     parser.add_argument("--output-dir", default=str(OUTPUT_DIR), help="Output folder")
     parser.add_argument("--output-prefix", default="baseline", help="Report filename prefix")
+    parser.add_argument("--assert-gates", action="store_true", help="Compare against latest_baseline.json and exit 1 on regression")
     args = parser.parse_args()
 
     locales = ["en", "zh", "ja"]
@@ -267,6 +318,13 @@ def main() -> None:
     print(f"baseline_md: {md_path}")
     print(f"latest_json: {latest_json}")
     print(f"latest_md: {latest_md}")
+
+    if args.assert_gates:
+        import sys
+        prev_baseline = OUTPUT_DIR / "latest_baseline.json"
+        if not _assert_gates(report, prev_baseline):
+            # Write new baseline before exiting so CI artifacts show the regression
+            sys.exit(1)
 
 
 if __name__ == "__main__":

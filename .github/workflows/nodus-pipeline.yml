@@ -1,0 +1,70 @@
+name: Nodus Data Pipeline
+
+# 手動觸發：在 GitHub Actions UI 點 "Run workflow"
+# 用途：對已提交的 data/all_nodes.json 執行完整驗證與品質 gate 檢查
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "只檢查特定 domain（留空 = 全部，例如：MAT、PHY）"
+        type: string
+        default: ""
+
+jobs:
+  validate:
+    name: Schema Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python deps
+        run: pip install pyyaml
+
+      - name: Run node validation
+        working-directory: scripts
+        run: python validate_nodes.py
+
+  quality-check:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python deps
+        run: pip install pyyaml
+
+      - name: Run quality gate
+        working-directory: scripts
+        run: |
+          if [ -n "${{ github.event.inputs.domain }}" ]; then
+            python quality_check.py --domain "${{ github.event.inputs.domain }}" --ci-mode
+          else
+            python quality_check.py --ci-mode
+          fi
+
+# ── 如需加入生成 / 增強步驟 ─────────────────────────────────────────────────
+# 生成節點 (generate) 和增強描述 (enhance) 需要 ANTHROPIC_API_KEY，
+# 且必須在執行後 commit 結果回 repo，因此不納入自動 CI。
+# 這些步驟應在本地執行，並用 scripts/nodus_utils.Checkpoint 追蹤斷點狀態。
+#
+# 本地執行範例：
+#   cd scripts
+#   python generate_nodes.py --domain MAT --batches 1
+#   python validate_nodes.py
+#   python enhance_descriptions.py
+#   python quality_check.py --ci-mode

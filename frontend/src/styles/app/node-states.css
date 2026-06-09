@@ -1,5 +1,3 @@
-/* learned = soft aqua tick · available = pulsing gold mark (on .state-mark,
-   so the white-hot core stays a clean star) */
 .node.learned circle.state-mark {
     fill: rgba(150, 230, 215, 0.95)
 }

@@ -1,5 +1,5 @@
-/* Flowing photon — one long luminous dash glides the lit edge, vanishes,
-   returns. Heavy drop-shadow makes it read as a diffuse band of light. */
+/* photon — shared chrome (canonical: app). */
+
 .photon {
     fill: none;
     stroke-width: 1.1px;

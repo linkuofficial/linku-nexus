@@ -1,4 +1,5 @@
-/* Legend */
+/* legend — shared chrome (canonical: app). */
+
 #legend {
     position: fixed;
     left: 20px;
@@ -12,7 +13,7 @@
     border: 1px solid var(--line-subtle);
     border-radius: var(--radius-md);
     backdrop-filter: blur(16px);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-soft)
 }
 
 .li {
@@ -21,11 +22,10 @@
     gap: 8px;
     font-size: 12px;
     color: #9db0c8;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace
 }
 
 .ll {
     width: 18px;
-    height: 2px;
-    border-radius: 1px;
+    height: 1.5px
 }

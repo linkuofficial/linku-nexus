@@ -1,0 +1,25 @@
+/* tokens.css — canonical :root palette (app), shared by both graph pages. */
+
+:root {
+    --bg-0: #080808;
+    --bg-1: #0a0a0f;
+    --bg-2: #0c0c12;
+    --ink-main: #d8e2ef;
+    --ink-soft: #8fa0b8;
+    --ink-faint: #7a8fbc;
+    --line-subtle: rgba(255, 255, 255, 0.14);
+    --glass-1: rgba(8, 8, 12, 0.80);
+    --glass-2: rgba(10, 10, 16, 0.88);
+    --panel-bg: rgba(242, 246, 252, 0.96);
+    --panel-ink: #334155;
+    --panel-soft: #64748b;
+    --panel-faint: #94a3b8;
+    --accent: var(--nodus-accent);
+    --radius-sm: var(--nodus-radius-sm);
+    --radius-md: var(--nodus-radius-md);
+    --radius-lg: var(--nodus-radius-lg);
+    --shadow-soft: var(--nodus-shadow-soft);
+    --shadow-strong: var(--nodus-shadow-strong);
+    --ease-ui: var(--nodus-ease-ui);
+    --panel-desktop-width: 332px;
+}

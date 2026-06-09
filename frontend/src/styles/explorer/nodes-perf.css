@@ -1,41 +1,6 @@
-/* Perf: detail (minor) stars are tiny and the most numerous — skip their
-   idle twinkle/pulse so only the prominent field & concept stars animate.
-   Cuts per-frame gradient repaints without a visible loss. */
 .node.tier-minor circle.corona.twinkle,
 .node.tier-minor.frontier circle.glow {
     animation: none !important;
-}
-
-@keyframes nodusFlow {
-    0% {
-        stroke-dashoffset: 360;
-    }
-
-    100% {
-        stroke-dashoffset: -360;
-    }
-}
-
-@keyframes nodusFlowGold {
-    0% {
-        stroke-dashoffset: 380;
-    }
-
-    100% {
-        stroke-dashoffset: -380;
-    }
-}
-
-@keyframes nodusSelHalo {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
 }
 
 .node.focus-dim circle,

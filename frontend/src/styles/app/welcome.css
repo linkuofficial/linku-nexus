@@ -1,4 +1,3 @@
-/* Welcome overlay */
 #welcome-overlay {
     position: fixed;
     inset: 0;
@@ -30,8 +29,7 @@
     pointer-events: auto;
 }
 
-#app-onboard-card,
-#shortcuts-card {
+#app-onboard-card {
     position: absolute;
     left: 50%;
     bottom: 24px;
@@ -111,13 +109,6 @@
     border-radius: 14px;
 }
 
-#shortcuts-intro {
-    font-size: 12px;
-    line-height: 1.65;
-    color: #a5b7ce;
-    margin-bottom: 12px;
-}
-
 #shortcut-list {
     display: grid;
     gap: 8px;
@@ -158,8 +149,7 @@
     color: #f7d27d;
 }
 
-#app-onboard-actions,
-#shortcuts-actions {
+#app-onboard-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;

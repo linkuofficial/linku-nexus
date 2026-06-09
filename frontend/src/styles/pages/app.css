@@ -1,27 +1,43 @@
-/* app.css — extracted verbatim from app.html (de-inlined, cascade-preserved). */
+/* app.css — manifest. Shared chrome in ../components (canonical), app-only in ../app. */
 
 /* Component manifest — @imports load in cascade order. */
+@import "../components/tokens.css";
+@import "../components/keyframes.css";
+@import "../components/_base.css";
 @import "../app/_base.css";
+@import "../components/edges.css";
 @import "../app/edges.css";
-@import "../app/photon.css";
+@import "../components/photon.css";
+@import "../components/nodes.css";
 @import "../app/nodes.css";
 @import "../app/node-states.css";
+@import "../components/focus-ring.css";
 @import "../app/focus-ring.css";
+@import "../components/perf.css";
 @import "../app/perf.css";
 @import "../app/arrow-markers.css";
+@import "../components/panel.css";
 @import "../app/panel.css";
+@import "../components/badge.css";
 @import "../app/badge.css";
-@import "../app/connections.css";
+@import "../components/connections.css";
 @import "../app/connection-extras.css";
 @import "../app/learning-path.css";
+@import "../components/breadcrumb.css";
 @import "../app/breadcrumb.css";
-@import "../app/legend.css";
+@import "../components/legend.css";
+@import "../components/header.css";
 @import "../app/header.css";
+@import "../components/search.css";
 @import "../app/search.css";
+@import "../components/filter-bar.css";
 @import "../app/filter-bar.css";
 @import "../app/mode-toggle.css";
 @import "../app/learned-counter.css";
+@import "../components/language-toggle.css";
 @import "../app/language-toggle.css";
+@import "../components/loading.css";
 @import "../app/loading.css";
+@import "../components/welcome.css";
 @import "../app/welcome.css";
 @import "../app/lp-hint.css";

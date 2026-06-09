@@ -1,7 +1,3 @@
-/* Perf mode — KEEP the glow (it is the star); only drop the wide faint
-   corona/halo layers + filters/motion. The field (primary) anchor stars
-   keep their bloom in both modes so crossing the threshold doesn't pop;
-   only the many small concept/detail stars are simplified. */
 .perf-mode .node:not(.tier-primary) circle.corona,
 .perf-mode .node:not(.tier-primary) circle.halo {
     display: none !important;
@@ -18,18 +14,6 @@
 
 .perf-mode .node circle {
     filter: none !important;
-}
-
-.perf-mode .link.focus-curve.active {
-    filter: none !important;
-}
-
-.perf-mode .photon {
-    display: none !important;
-}
-
-.perf-mode .link {
-    transition: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

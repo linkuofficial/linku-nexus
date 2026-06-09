@@ -1,0 +1,13 @@
+/* perf — shared chrome (canonical: app). */
+
+.perf-mode .link.focus-curve.active {
+    filter: none !important
+}
+
+.perf-mode .photon {
+    display: none
+}
+
+.perf-mode .link {
+    transition: none !important
+}

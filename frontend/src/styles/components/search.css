@@ -1,0 +1,63 @@
+/* search — shared chrome (canonical: app). */
+
+#search-box {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 10;
+    opacity: 1;
+    transition: transform 0.28s var(--ease-ui), opacity 0.22s ease
+}
+
+#search-input {
+    width: 400px;
+    min-height: 48px;
+    padding: 14px 18px;
+    background: var(--glass-2);
+    border: 1px solid var(--line-subtle);
+    color: #d4dfed;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    border-radius: var(--radius-md);
+    outline: none;
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-soft);
+    transition: border-color 0.2s ease, background 0.2s ease
+}
+
+#search-input::placeholder {
+    color: #90a2bb
+}
+
+#search-input:focus {
+    border-color: rgba(196, 214, 235, 0.45);
+    background: rgba(15, 27, 48, 0.95)
+}
+
+#search-results {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    width: 400px;
+    background: rgba(10, 20, 37, 0.94);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: var(--shadow-soft)
+}
+
+.sr {
+    padding: 11px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: background 0.15s ease
+}
+
+.sr:hover {
+    background: rgba(191, 212, 236, 0.12)
+}

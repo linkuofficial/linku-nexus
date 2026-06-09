@@ -1,13 +1,28 @@
-/* explorer.css — extracted verbatim from explorer.html (de-inlined, cascade-preserved). */
+/* explorer.css — manifest. Shared chrome in ../components (canonical: app), explorer-only in ../explorer. */
 
 /* Component manifest — @imports load in cascade order. */
-@import "../explorer/_base.css";
+@import "../components/tokens.css";
+@import "../components/keyframes.css";
+@import "../components/_base.css";
+@import "../components/edges.css";
+@import "../components/photon.css";
+@import "../components/nodes.css";
+@import "../components/focus-ring.css";
+@import "../components/perf.css";
+@import "../components/panel.css";
+@import "../components/badge.css";
+@import "../components/connections.css";
+@import "../components/breadcrumb.css";
+@import "../components/legend.css";
+@import "../components/header.css";
+@import "../components/search.css";
+@import "../components/filter-bar.css";
+@import "../components/language-toggle.css";
+@import "../components/loading.css";
+@import "../components/welcome.css";
 @import "../explorer/particles.css";
-@import "../explorer/canvas.css";
 @import "../explorer/edges.css";
-@import "../explorer/photon.css";
 @import "../explorer/nodes.css";
-@import "../explorer/focus-ring.css";
 @import "../explorer/nodes-perf.css";
 @import "../explorer/node-entrance.css";
 @import "../explorer/expand-ring.css";
@@ -18,12 +33,9 @@
 @import "../explorer/header.css";
 @import "../explorer/stats.css";
 @import "../explorer/welcome.css";
-@import "../explorer/panel.css";
-@import "../explorer/badge.css";
 @import "../explorer/panel-actions.css";
 @import "../explorer/link-tooltip.css";
 @import "../explorer/connections.css";
-@import "../explorer/legend.css";
 @import "../explorer/controls.css";
 @import "../explorer/breadcrumb.css";
 @import "../explorer/context-menu.css";

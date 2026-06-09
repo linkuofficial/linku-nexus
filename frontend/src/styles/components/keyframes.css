@@ -1,0 +1,117 @@
+/* keyframes.css — all graph animations, shared by both pages. */
+
+@keyframes frontier-glow {
+
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes node-enter {
+    from {
+        transform: scale(0.3);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes nodusFlow {
+    0% {
+        stroke-dashoffset: 360
+    }
+
+    100% {
+        stroke-dashoffset: -360
+    }
+}
+
+@keyframes nodusFlowGold {
+    0% {
+        stroke-dashoffset: 380
+    }
+
+    100% {
+        stroke-dashoffset: -380
+    }
+}
+
+@keyframes nodusSelHalo {
+
+    0%,
+    100% {
+        opacity: 0.6
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@keyframes nodusTwinkle {
+
+    0%,
+    100% {
+        opacity: 0.85
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.7
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@keyframes search-pulse {
+    0% {
+        box-shadow: var(--shadow-soft);
+    }
+
+    30% {
+        box-shadow: 0 0 0 4px rgba(240, 192, 80, 0.18), var(--shadow-soft);
+    }
+
+    100% {
+        box-shadow: var(--shadow-soft);
+    }
+}
+
+@keyframes simPulse {
+
+    0%,
+    100% {
+        opacity: 0.3
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@keyframes topChromeHintPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(240, 192, 80, 0.12);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(240, 192, 80, 0.06);
+    }
+}

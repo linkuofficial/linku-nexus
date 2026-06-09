@@ -1,0 +1,29 @@
+/* welcome — shared chrome (canonical: app). */
+
+#shortcuts-card {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: min(560px, calc(100vw - 24px));
+    background: rgba(4, 10, 22, 0.95);
+    border: 1px solid rgba(190, 207, 226, 0.22);
+    border-radius: 14px;
+    box-shadow: var(--shadow-strong);
+    backdrop-filter: blur(16px);
+    padding: 16px 18px;
+    pointer-events: auto;
+}
+
+#shortcuts-intro {
+    font-size: 12px;
+    line-height: 1.65;
+    color: #a5b7ce;
+    margin-bottom: 12px;
+}
+
+#shortcuts-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

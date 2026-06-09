@@ -1,0 +1,88 @@
+/* filter-bar — shared chrome (canonical: app). */
+
+#filter-bar {
+    position: fixed;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    z-index: 6;
+    justify-content: center;
+    opacity: 1;
+    transition: transform 0.28s var(--ease-ui), opacity 0.22s ease
+}
+
+#top-chrome-trigger {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(760px, 95vw);
+    height: 154px;
+    z-index: 9;
+    background: transparent
+}
+
+#top-chrome-hint {
+    position: fixed;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 132px;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(240, 192, 80, 0.12), rgba(240, 192, 80, 0.78), rgba(240, 192, 80, 0.12));
+    z-index: 9;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease
+}
+
+body.top-ui-collapsed #hdr {
+    transform: translateY(-18px);
+    opacity: 0.22
+}
+
+body.top-ui-collapsed #lang-toggle {
+    transform: translateY(-18px);
+    opacity: 0.2
+}
+
+body.top-ui-collapsed #search-box {
+    transform: translateX(-50%) translateY(-34px);
+    opacity: 0;
+    pointer-events: none
+}
+
+body.top-ui-collapsed #top-chrome-hint {
+    opacity: 1;
+    animation: topChromeHintPulse 2.2s ease-in-out infinite
+}
+
+.filter-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 10px 14px;
+    min-height: 44px;
+    border: 1px solid var(--line-subtle);
+    background: var(--glass-1);
+    color: #b7c8dc;
+    cursor: pointer;
+    border-radius: 999px;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+    backdrop-filter: blur(10px)
+}
+
+.filter-btn.active {
+    background: rgba(240, 192, 80, 0.25);
+    border-color: rgba(240, 192, 80, 0.75);
+    color: #f7db95 !important;
+    box-shadow: 0 0 0 1px rgba(240, 192, 80, 0.32), 0 8px 22px rgba(240, 192, 80, 0.2)
+}
+
+.filter-btn:hover {
+    background: rgba(190, 207, 226, 0.18)
+}

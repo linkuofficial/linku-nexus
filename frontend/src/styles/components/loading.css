@@ -1,0 +1,13 @@
+/* loading — shared chrome (canonical: app). */
+
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #94a7bf;
+    z-index: 20;
+    text-align: center
+}

@@ -1,0 +1,60 @@
+/* Controls */
+#controls {
+    position: fixed;
+    left: 20px;
+    top: 96px;
+    z-index: 6;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 330px;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line-subtle);
+    background: var(--glass-1);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-soft);
+    opacity: 0.82;
+    transition: opacity 0.2s ease;
+}
+
+#controls:hover {
+    opacity: 1;
+}
+
+.ctrl-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 7px 12px;
+    border: 1px solid var(--line-subtle);
+    background: var(--glass-1);
+    color: #9db0c8;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.2s;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+    white-space: nowrap;
+}
+
+.ctrl-btn:hover {
+    background: rgba(190, 207, 226, 0.12);
+    color: var(--ink-main);
+}
+
+.ctrl-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.ctrl-btn.active {
+    background: rgba(240, 192, 80, 0.18);
+    border-color: rgba(240, 192, 80, 0.5);
+    color: #f7d27d;
+}
+
+.ctrl-btn.danger:hover {
+    background: rgba(201, 91, 91, 0.15);
+    color: #f08080;
+    border-color: rgba(201, 91, 91, 0.3);
+}

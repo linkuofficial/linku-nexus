@@ -1,0 +1,30 @@
+/* Connections list */
+#p-conns h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #8fa0b8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 4px
+}
+
+.ci {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: var(--radius-md);
+    background: rgba(148, 163, 184, 0.06);
+    font-size: 11px;
+    cursor: pointer;
+    margin-bottom: 6px;
+    color: #4d5f77;
+    transition: all 0.18s ease
+}
+
+.ci:hover {
+    color: #334155;
+    background: rgba(148, 163, 184, 0.12)
+}

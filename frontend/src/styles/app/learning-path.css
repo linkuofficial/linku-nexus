@@ -1,0 +1,15 @@
+/* Learning path panel sections */
+#p-prereqs,
+#p-unlocks {
+    margin-bottom: 14px
+}
+
+#p-prereqs h4,
+#p-unlocks h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: #c1912f;
+    text-transform: uppercase;
+    margin-bottom: 8px
+}

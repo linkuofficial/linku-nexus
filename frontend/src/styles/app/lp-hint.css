@@ -1,0 +1,25 @@
+/* LP mode filter hint */
+#lp-filter-hint {
+    position: fixed;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--glass-1);
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(240, 192, 80, 0.3);
+    z-index: 6;
+    display: none;
+    backdrop-filter: blur(10px);
+}
+
+body.lp-active #lp-filter-hint {
+    display: block;
+}
+
+body.lp-active #filter-bar {
+    display: none;
+}

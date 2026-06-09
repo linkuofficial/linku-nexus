@@ -1,0 +1,66 @@
+/* Welcome overlay */
+#welcome {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.6s var(--ease-ui);
+}
+
+#welcome.hidden {
+    opacity: 0;
+}
+
+#welcome h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+#welcome p {
+    font-size: 11px;
+    color: var(--ink-faint);
+    opacity: 0.6;
+}
+
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 7;
+    display: none;
+}
+
+#loading-text {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+}
+
+#loading-retry {
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line-subtle);
+    background: rgba(191, 212, 236, 0.08);
+    color: var(--ink-main);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    display: none;
+    transition: background 0.15s;
+}
+
+#loading-retry:hover {
+    background: rgba(191, 212, 236, 0.14);
+}

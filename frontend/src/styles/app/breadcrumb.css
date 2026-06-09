@@ -1,0 +1,26 @@
+/* Breadcrumb */
+#p-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+    align-items: center
+}
+
+.bc-item {
+    font-size: 10px;
+    color: #7e8ca0;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: color 0.2s
+}
+
+.bc-item:hover {
+    color: #516178
+}
+
+.bc-sep {
+    font-size: 10px;
+    color: #9aa8bc;
+    margin: 0 2px
+}

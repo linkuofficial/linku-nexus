@@ -1,0 +1,74 @@
+/* Keyboard shortcuts overlay */
+#shortcuts {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 8, 18, 0.75);
+    backdrop-filter: blur(6px);
+}
+
+#shortcuts.visible {
+    display: flex;
+}
+
+#shortcuts-card {
+    background: rgba(4, 10, 22, 0.96);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    max-width: 360px;
+    width: 90vw;
+    box-shadow: var(--shadow-strong);
+}
+
+#shortcuts-card h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+}
+
+#shortcuts-intro {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+}
+
+.sc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sc-row:last-child {
+    border-bottom: none;
+}
+
+.sc-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    padding: 3px 7px;
+    color: var(--ink-main);
+}
+
+.sc-desc {
+    font-size: 11px;
+    color: var(--ink-soft);
+}
+
+#shortcuts-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}

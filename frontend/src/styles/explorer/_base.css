@@ -1,0 +1,69 @@
+/* explorer.css — extracted verbatim from explorer.html (de-inlined, cascade-preserved). */
+
+:root {
+    --bg-0: #07090f;
+    --bg-1: #0a0d16;
+    --bg-2: #101622;
+    --ink-main: #dce6f4;
+    --ink-soft: #94a8c4;
+    --ink-faint: #5a6f8c;
+    --line-subtle: rgba(255, 255, 255, 0.10);
+    --glass-1: rgba(8, 10, 18, 0.78);
+    --glass-2: rgba(10, 12, 22, 0.88);
+    --panel-bg: rgba(236, 240, 248, 0.96);
+    --panel-ink: #2d3d52;
+    --panel-soft: #5a6d84;
+    --panel-faint: #8a9bb2;
+    --accent: var(--nodus-accent);
+    --radius-sm: var(--nodus-radius-sm);
+    --radius-md: var(--nodus-radius-md);
+    --radius-lg: var(--nodus-radius-lg);
+    --shadow-soft: var(--nodus-shadow-soft);
+    --shadow-strong: var(--nodus-shadow-strong);
+    --ease-ui: var(--nodus-ease-ui);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+body {
+    background:
+        radial-gradient(900px 700px at 20% 15%, rgba(52, 42, 112, 0.08), transparent 70%),
+        radial-gradient(700px 600px at 80% 75%, rgba(24, 52, 104, 0.07), transparent 70%),
+        radial-gradient(500px 400px at 60% 30%, rgba(66, 34, 100, 0.05), transparent 65%),
+        radial-gradient(600px 500px at 35% 80%, rgba(20, 40, 90, 0.05), transparent 68%),
+        linear-gradient(165deg, var(--bg-0) 0%, var(--bg-1) 50%, var(--bg-2) 100%);
+    color: var(--ink-main);
+    font-family: 'IBM Plex Sans', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    letter-spacing: 0.01em;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(3, 4, 12, 0.55) 100%),
+        linear-gradient(to bottom, rgba(3, 4, 12, 0) 45%, rgba(3, 4, 12, 0.45) 100%);
+    pointer-events: none;
+    z-index: 0;
+}

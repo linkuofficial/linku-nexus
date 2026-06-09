@@ -1,0 +1,54 @@
+/* Panel actions */
+#p-actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 6px;
+    padding: 12px 0 4px;
+    margin-top: 16px;
+    background: linear-gradient(to bottom, transparent, var(--panel-bg) 30%);
+}
+
+.p-act-btn {
+    flex: 1;
+    padding: 9px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.08);
+    color: var(--panel-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.p-act-btn:hover {
+    background: rgba(148, 163, 184, 0.16);
+    color: var(--panel-ink);
+}
+
+.p-conn-toggle {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--panel-faint);
+    background: none;
+    border: 1px dashed rgba(148, 163, 184, 0.22);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.p-conn-toggle:hover {
+    color: var(--panel-soft);
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+#p-conn-count {
+    font-weight: 400;
+    color: var(--panel-faint);
+}

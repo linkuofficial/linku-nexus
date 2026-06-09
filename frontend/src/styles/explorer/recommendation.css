@@ -1,0 +1,73 @@
+/* Recommendation chip */
+#recommend {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 6;
+    display: none;
+}
+
+#recommend.visible {
+    display: block;
+}
+
+#recommend-inner {
+    background: var(--glass-1);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-strong);
+    padding: 12px 16px;
+    max-width: 240px;
+}
+
+#recommend-inner h4 {
+    font-family: 'IBM Plex Sans', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+}
+
+.rec-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    font-size: 12px;
+    color: var(--ink-main);
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 3px;
+    border: 1px solid transparent;
+    background: transparent;
+    text-align: left;
+}
+
+.rec-item:hover {
+    background: rgba(190, 207, 226, 0.1);
+    color: var(--ink-main);
+}
+
+.rec-item:focus-visible {
+    border-color: rgba(240, 192, 80, 0.72);
+    background: rgba(240, 192, 80, 0.14);
+}
+
+.rec-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.rec-score {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-left: auto;
+}

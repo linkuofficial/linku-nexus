@@ -1,0 +1,129 @@
+/* Responsive */
+@media (max-width: 768px) {
+
+    #hdr {
+        display: none;
+    }
+
+    #search-box {
+        left: 12px;
+        top: 12px;
+        transform: none;
+    }
+
+    #search-input,
+    #search-results {
+        width: calc(100vw - 24px);
+    }
+
+    #search-results {
+        top: 50px;
+    }
+
+    #panel {
+        width: 100%;
+        height: min(70vh, 600px);
+        top: auto;
+        bottom: 0;
+        border-left: none;
+        border-top: 1px solid rgba(148, 163, 184, 0.26);
+        transform: translateY(100%);
+        border-radius: 18px 18px 0 0;
+    }
+
+    #panel.open {
+        transform: translateY(0);
+    }
+
+    #legend {
+        display: none;
+    }
+
+    #hdr {
+        top: 12px;
+        left: 12px;
+        padding: 8px 10px;
+    }
+
+    #stats {
+        right: 12px;
+        top: 66px;
+        max-width: 210px;
+    }
+
+    #lang-toggle {
+        right: 12px;
+        top: 12px;
+    }
+
+    #controls {
+        left: 12px;
+        right: 12px;
+        top: auto;
+        bottom: 12px;
+        width: auto;
+        padding: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        opacity: 0.96;
+    }
+
+    #controls::-webkit-scrollbar {
+        display: none;
+    }
+
+    #filter-bar {
+        top: 70px;
+        left: 12px;
+        transform: none;
+        width: calc(100vw - 24px);
+        max-width: none;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 4px 2px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        border-radius: var(--radius-md);
+    }
+
+    #top-chrome-trigger,
+    #top-chrome-hint {
+        display: none;
+    }
+
+    body.top-ui-collapsed #hdr,
+    body.top-ui-collapsed #lang-toggle,
+    body.top-ui-collapsed #stats,
+    body.top-ui-collapsed #search-box,
+    body.top-ui-collapsed #filter-bar.visible {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+    }
+
+    #filter-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    #onboard-card {
+        bottom: 12px;
+    }
+
+    #welcome {
+        top: 40%;
+        width: calc(100vw - 36px);
+    }
+
+    #recommend {
+        display: none !important;
+    }
+
+    #zoom-indicator {
+        display: none;
+    }
+}

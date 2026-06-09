@@ -1,0 +1,13 @@
+/* Path highlight */
+.link.path-edge {
+    stroke: var(--accent) !important;
+    stroke-opacity: 0;
+    stroke-width: 2.5px;
+    stroke-dasharray: none;
+}
+
+.node.on-path circle {
+    stroke: var(--accent) !important;
+    stroke-width: 2.5px;
+    filter: drop-shadow(0 0 6px rgba(240, 192, 80, 0.5));
+}

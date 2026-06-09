@@ -1,0 +1,14 @@
+/* Background particle canvas */
+#bgCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.perf-mode #bgCanvas {
+    opacity: 0.18;
+    transition: opacity 0.4s var(--ease-ui);
+}

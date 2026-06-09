@@ -1,0 +1,32 @@
+/* Context menu */
+#ctx-menu {
+    position: fixed;
+    z-index: 20;
+    background: rgba(4, 10, 22, 0.96);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-strong);
+    padding: 4px 0;
+    display: none;
+    min-width: 160px;
+}
+
+.ctx-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 9px 16px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: background 0.12s, color 0.12s;
+}
+
+.ctx-item:hover {
+    background: rgba(191, 212, 236, 0.1);
+    color: var(--ink-main);
+}
+
+.ctx-item.danger:hover {
+    background: rgba(201, 91, 91, 0.12);
+    color: #f08080;
+}

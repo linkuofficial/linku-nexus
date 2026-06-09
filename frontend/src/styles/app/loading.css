@@ -1,0 +1,155 @@
+/* Loading */
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #94a7bf;
+    z-index: 20;
+    text-align: center
+}
+
+#loading button {
+    margin-top: 10px;
+    padding: 7px 12px;
+    border: 1px solid var(--line-subtle);
+    border-radius: 999px;
+    background: var(--glass-1);
+    color: var(--ink-main);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+@media (max-width: 1080px) {
+
+    #search-input,
+    #search-results {
+        width: 320px
+    }
+
+    #filter-bar {
+        max-width: 360px
+    }
+
+    #panel {
+        width: 304px;
+        padding: 22px 18px 18px
+    }
+
+    :root {
+        --panel-desktop-width: 304px;
+    }
+
+    #p-label {
+        font-size: 28px
+    }
+}
+
+@media (max-width: 760px) {
+    #hdr {
+        top: 12px;
+        left: 12px;
+        padding: 8px 10px
+    }
+
+    #search-box {
+        top: 62px;
+        left: 12px;
+        transform: none
+    }
+
+    #search-input,
+    #search-results {
+        width: min(66vw, 260px)
+    }
+
+    #filter-bar {
+        top: 112px;
+        left: 12px;
+        transform: none;
+        max-width: 72vw;
+        justify-content: flex-start
+    }
+
+    #top-chrome-trigger,
+    #top-chrome-hint {
+        display: none
+    }
+
+    body.top-ui-collapsed #hdr,
+    body.top-ui-collapsed #lang-toggle,
+    body.top-ui-collapsed #search-box,
+    body.top-ui-collapsed #filter-bar {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto
+    }
+
+    #mode-toggle {
+        left: 12px;
+        top: auto;
+        bottom: 82px
+    }
+
+    #learned-info {
+        left: 12px;
+        top: auto;
+        bottom: 52px
+    }
+
+    #lang-toggle {
+        right: 12px;
+        top: 12px
+    }
+
+    #legend {
+        display: none
+    }
+
+    #panel {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid rgba(148, 163, 184, 0.26);
+        transform: translateY(100%);
+        height: min(72vh, 620px);
+        top: auto;
+        bottom: 0;
+        border-radius: 18px 18px 0 0
+    }
+
+    #panel.open {
+        transform: translateY(0)
+    }
+
+    #mode-toggle {
+        top: 82px;
+        gap: 8px;
+    }
+
+    .mode-btn {
+        padding-inline: 14px;
+    }
+
+    #app-onboard-card,
+    #shortcuts-card {
+        bottom: 12px;
+        padding: 14px;
+    }
+
+    .shortcut-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .shortcut-row span:last-child {
+        text-align: left;
+    }
+
+    #p-label {
+        font-size: 28px
+    }
+}

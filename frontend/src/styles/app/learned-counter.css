@@ -1,0 +1,16 @@
+/* Learned counter */
+#learned-info {
+    position: fixed;
+    left: 20px;
+    top: 180px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: #8af3b5;
+    z-index: 6;
+    display: none;
+    padding: 10px 14px;
+    min-height: 44px;
+    border-radius: 999px;
+    background: rgba(11, 20, 36, 0.72);
+    border: 1px solid rgba(138, 243, 181, 0.32)
+}

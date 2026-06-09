@@ -1,0 +1,14 @@
+/* Expand ring indicator */
+.expand-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1px;
+    stroke-dasharray: 3, 3;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.node.frontier:hover .expand-ring {
+    opacity: 0.6;
+}

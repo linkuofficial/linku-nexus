@@ -1,0 +1,49 @@
+/* Mode toggle */
+#mode-toggle {
+    position: fixed;
+    left: 20px;
+    top: 118px;
+    z-index: 6;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start
+}
+
+.mode-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 13px 20px;
+    min-height: 48px;
+    border: 1px solid var(--line-subtle);
+    background: var(--glass-1);
+    color: #9db0c8;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft)
+}
+
+.mode-btn:hover {
+    background: rgba(190, 207, 226, 0.12)
+}
+
+.mode-btn.active {
+    background: rgba(240, 192, 80, 0.16);
+    border-color: rgba(240, 192, 80, 0.62);
+    color: #f6c86a
+}
+
+.mode-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor
+}
+
+#help-btn {
+    padding-inline: 18px;
+}

@@ -1,0 +1,14 @@
+/* learned = soft aqua tick · available = pulsing gold mark (on .state-mark,
+   so the white-hot core stays a clean star) */
+.node.learned circle.state-mark {
+    fill: rgba(150, 230, 215, 0.95)
+}
+
+.node.available circle.state-mark {
+    fill: #fbbf24;
+    animation: pulse 1.5s infinite
+}
+
+.node.on-path circle.glow {
+    filter: brightness(1.3)
+}

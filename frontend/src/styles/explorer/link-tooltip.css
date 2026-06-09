@@ -1,0 +1,21 @@
+/* Link tooltip */
+#link-tooltip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 20;
+    background: rgba(4, 10, 22, 0.94);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-sm);
+    backdrop-filter: blur(10px);
+    padding: 5px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    opacity: 0;
+    transition: opacity 0.12s;
+    white-space: nowrap;
+}
+
+#link-tooltip.visible {
+    opacity: 1;
+}

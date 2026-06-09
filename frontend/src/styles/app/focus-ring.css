@@ -1,0 +1,100 @@
+/* Dual-concentric focus ring — only on the selected star */
+.focus-ring {
+    animation: nodusSelHalo 3.6s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center
+}
+
+.focus-ring circle {
+    fill: none
+}
+
+.focus-ring .fr-bloom {
+    stroke: rgba(255, 255, 255, 0.26);
+    stroke-width: 5px;
+    filter: blur(4px)
+}
+
+.focus-ring .fr-band {
+    stroke: rgba(255, 255, 255, 0.7);
+    stroke-width: 1.6px;
+    filter: blur(1px)
+}
+
+.focus-ring .fr-edge {
+    stroke: rgba(255, 255, 255, 0.92);
+    stroke-width: 0.5px
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.7
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@keyframes nodusTwinkle {
+
+    0%,
+    100% {
+        opacity: 0.85
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+.node circle.corona.twinkle {
+    animation-name: nodusTwinkle;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out
+}
+
+@keyframes nodusFlow {
+    0% {
+        stroke-dashoffset: 360
+    }
+
+    100% {
+        stroke-dashoffset: -360
+    }
+}
+
+@keyframes nodusFlowGold {
+    0% {
+        stroke-dashoffset: 380
+    }
+
+    100% {
+        stroke-dashoffset: -380
+    }
+}
+
+@keyframes nodusSelHalo {
+
+    0%,
+    100% {
+        opacity: 0.6
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .node circle.corona.twinkle,
+    .photon,
+    .photon.photon-gold,
+    .focus-ring,
+    .node.available circle.state-mark {
+        animation: none !important
+    }
+}

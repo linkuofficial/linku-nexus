@@ -1,0 +1,41 @@
+/* Tooltip */
+#tooltip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 20;
+    background: rgba(4, 8, 18, 0.95);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(14px);
+    padding: 10px 14px;
+    max-width: 280px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: var(--shadow-soft);
+}
+
+#tooltip.visible {
+    opacity: 1;
+}
+
+#tooltip .tt-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-main);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+#tooltip .tt-desc {
+    font-size: 10px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+}
+
+#tooltip .tt-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-faint);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+}

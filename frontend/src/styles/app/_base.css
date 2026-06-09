@@ -1,0 +1,115 @@
+/* app.css — extracted verbatim from app.html (de-inlined, cascade-preserved). */
+
+:root {
+    --bg-0: #080808;
+    --bg-1: #0a0a0f;
+    --bg-2: #0c0c12;
+    --ink-main: #d8e2ef;
+    --ink-soft: #8fa0b8;
+    --ink-faint: #7a8fbc;
+    --line-subtle: rgba(255, 255, 255, 0.14);
+    --glass-1: rgba(8, 8, 12, 0.80);
+    --glass-2: rgba(10, 10, 16, 0.88);
+    --panel-bg: rgba(242, 246, 252, 0.96);
+    --panel-ink: #334155;
+    --panel-soft: #64748b;
+    --panel-faint: #94a3b8;
+    --accent: var(--nodus-accent);
+    --radius-sm: var(--nodus-radius-sm);
+    --radius-md: var(--nodus-radius-md);
+    --radius-lg: var(--nodus-radius-lg);
+    --shadow-soft: var(--nodus-shadow-soft);
+    --shadow-strong: var(--nodus-shadow-strong);
+    --ease-ui: var(--nodus-ease-ui);
+    --panel-desktop-width: 332px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+body {
+    background:
+        radial-gradient(900px 700px at 20% 15%, rgba(60, 40, 120, 0.08), transparent 70%),
+        radial-gradient(700px 600px at 80% 75%, rgba(30, 50, 100, 0.06), transparent 70%),
+        radial-gradient(500px 400px at 60% 30%, rgba(80, 30, 100, 0.05), transparent 65%),
+        radial-gradient(600px 500px at 35% 80%, rgba(20, 40, 90, 0.06), transparent 68%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 50%, var(--bg-2));
+    color: var(--ink-main);
+    font-family: 'IBM Plex Sans', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    letter-spacing: 0.01em
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#bgCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.35) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    transform: translateY(-120%);
+    z-index: 30;
+    padding: 8px 12px;
+    background: #e2e8f0;
+    color: #0f172a;
+    border-radius: 8px;
+    border: 1px solid #94a3b8;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+#canvas {
+    width: 100vw;
+    height: 100vh;
+    cursor: grab;
+    position: relative;
+    z-index: 1;
+    touch-action: none
+}
+
+#canvas>g {
+    will-change: transform
+}
+
+#canvas:active {
+    cursor: grabbing
+}

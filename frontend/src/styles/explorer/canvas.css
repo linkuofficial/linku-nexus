@@ -1,0 +1,17 @@
+/* Canvas */
+#canvas {
+    width: 100vw;
+    height: 100vh;
+    cursor: grab;
+    position: relative;
+    z-index: 1;
+    touch-action: none
+}
+
+#canvas>g {
+    will-change: transform
+}
+
+#canvas:active {
+    cursor: grabbing;
+}

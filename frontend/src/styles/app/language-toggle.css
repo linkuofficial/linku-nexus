@@ -1,0 +1,70 @@
+/* Language toggle */
+#lang-toggle {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    z-index: 6;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 0;
+    transition: transform 0.28s var(--ease-ui), opacity 0.22s ease;
+}
+
+@media (min-width: 761px) {
+    body.panel-open #lang-toggle {
+        right: calc(var(--panel-desktop-width) + 16px);
+        z-index: 12;
+    }
+
+    body.panel-open.top-ui-collapsed #lang-toggle {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+.lang-btn {
+    position: relative;
+    padding: 10px 12px;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: rgba(150, 169, 193, 0.62);
+    cursor: pointer;
+    transition: color 0.15s;
+    font-size: 13px;
+}
+
+.lang-btn+.lang-btn {
+    border-left: none;
+}
+
+.lang-btn+.lang-btn::before {
+    content: '/';
+    position: absolute;
+    left: -4px;
+    color: rgba(214, 230, 248, 0.38);
+    pointer-events: none;
+}
+
+.lang-btn.active {
+    background: transparent;
+    color: #dbe7f6;
+}
+
+.lang-btn:hover {
+    background: transparent;
+    color: rgba(219, 231, 246, 0.88);
+}

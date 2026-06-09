@@ -1,0 +1,30 @@
+/* Legend */
+#legend {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 6;
+    padding: 10px 12px;
+    background: var(--glass-1);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-soft)
+}
+
+.li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #9db0c8;
+    font-family: 'IBM Plex Mono', monospace
+}
+
+.ll {
+    width: 18px;
+    height: 1.5px
+}

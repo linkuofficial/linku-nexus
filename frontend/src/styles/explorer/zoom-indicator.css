@@ -1,0 +1,22 @@
+/* Zoom indicator */
+#zoom-indicator {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 6;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    background: var(--glass-1);
+    border: 1px solid var(--line-subtle);
+    border-radius: var(--radius-sm);
+    backdrop-filter: blur(10px);
+    padding: 4px 8px;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    opacity: 0;
+}
+
+#zoom-indicator.visible {
+    opacity: 1;
+}

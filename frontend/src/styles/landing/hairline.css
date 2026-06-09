@@ -1,0 +1,12 @@
+/* Hairline borders */
+.hairline-border {
+    border: 0.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.hairline-bottom {
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.hairline-right {
+    border-right: 0.5px solid rgba(255, 255, 255, 0.05);
+}

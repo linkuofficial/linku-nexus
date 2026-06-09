@@ -1,0 +1,90 @@
+/* Onboarding */
+#onboard {
+    position: fixed;
+    inset: 0;
+    z-index: 18;
+    display: none;
+    pointer-events: auto;
+    background: radial-gradient(circle at 50% 25%, rgba(4, 8, 18, 0.36), rgba(8, 17, 31, 0.65));
+}
+
+#onboard.visible {
+    display: block;
+}
+
+#onboard-card {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    width: min(520px, calc(100vw - 24px));
+    background: rgba(4, 10, 22, 0.95);
+    border: 1px solid rgba(190, 207, 226, 0.24);
+    border-radius: 14px;
+    box-shadow: var(--shadow-strong);
+    backdrop-filter: blur(16px);
+    padding: 14px 16px;
+    pointer-events: auto;
+}
+
+#onboard-step {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+}
+
+#onboard-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #dce7f4;
+    margin-bottom: 6px;
+}
+
+#onboard-text {
+    font-size: 12px;
+    line-height: 1.65;
+    color: #a5b7ce;
+    margin-bottom: 12px;
+}
+
+#onboard-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+#onboard-hint {
+    margin-right: auto;
+    align-self: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-faint);
+    letter-spacing: 0.4px;
+}
+
+.ob-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line-subtle);
+    background: rgba(191, 212, 236, 0.08);
+    color: #dce8f6;
+    cursor: pointer;
+}
+
+.ob-btn.primary {
+    background: rgba(240, 192, 80, 0.16);
+    border-color: rgba(240, 192, 80, 0.48);
+    color: #f7d27d;
+}
+
+.tour-target {
+    position: relative;
+    z-index: 19 !important;
+    outline: 1px solid rgba(240, 192, 80, 0.5);
+    box-shadow: 0 0 0 6px rgba(240, 192, 80, 0.12);
+}

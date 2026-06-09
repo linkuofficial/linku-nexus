@@ -1,0 +1,18 @@
+/* Stats */
+#stats {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    z-index: 6;
+    padding: 9px 14px;
+    border-radius: var(--radius-md);
+    background: var(--glass-1);
+    border: 1px solid var(--line-subtle);
+    backdrop-filter: blur(14px);
+    font-size: 10px;
+    color: var(--ink-soft);
+    display: none;
+    max-width: 280px;
+    transition: transform 0.28s var(--ease-ui), opacity 0.22s ease;
+}

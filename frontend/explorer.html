@@ -32,6 +32,7 @@
     <link rel="preload" href="/api/graph/full" as="fetch" crossorigin>
     <title>Nodus — Explorer</title>
     <script src="/vendor/d3.min.js"></script>
+    <link rel="stylesheet" href="/nodus-fonts.css">
     <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="src/shared.css">
     <style>
@@ -114,7 +115,8 @@
         }
 
         .perf-mode #bgCanvas {
-            display: none;
+            opacity: 0.18;
+            transition: opacity 0.4s var(--ease-ui);
         }
 
         /* Canvas */
@@ -135,10 +137,13 @@
             cursor: grabbing;
         }
 
-        /* Links — colours defined in src/shared.css */
+        /* Constellation lines — colours defined in src/shared.css. Faint at
+           rest; the lit constellation gains glow + flowing photons. */
         .link {
-            stroke-opacity: 0.016;
-            stroke-width: 0.8px;
+            stroke-opacity: 0.10;
+            stroke-width: 0.6px;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
             fill: none;
             transition: stroke-opacity 0.3s;
         }
@@ -165,51 +170,72 @@
             stroke-opacity: 0;
             fill: none;
             stroke-width: 2px;
+            vector-effect: non-scaling-stroke;
             transition: stroke-opacity 0.2s ease;
         }
 
         .link.focus-curve.active {
-            stroke-opacity: 0.9;
+            stroke-opacity: 0.85;
+            filter: url(#edge-glow);
         }
 
         .link.focus-curve.path-edge {
-            stroke-opacity: 0.96;
+            stroke-opacity: 0.92;
         }
 
-        /* Nodes */
-        .node circle.core {
+        /* Flowing photon — one long luminous dash glides the lit edge. */
+        .photon {
+            fill: none;
+            stroke-width: 1.1px;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+            stroke-dasharray: 60 640;
+            animation: nodusFlow 3.6s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.28));
+            pointer-events: none;
+        }
+
+        .photon.photon-gold {
+            stroke-width: 0.95px;
+            stroke-dasharray: 54 680;
+            animation: nodusFlowGold 4.4s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px rgba(247, 210, 125, 0.5)) drop-shadow(0 0 6px rgba(247, 210, 125, 0.24));
+        }
+
+        /* Stars (nodes) — brightness IS the body; hover/select BRIGHTEN. */
+        .node circle.hit {
             cursor: pointer;
-            stroke-width: 1.2px;
+        }
+
+        .node circle.core,
+        .node circle.glow,
+        .node circle.halo {
+            pointer-events: none;
             transition: filter 0.3s var(--ease-ui), opacity 0.3s;
         }
 
-        .node:hover circle.core {
-            filter: brightness(1.4) drop-shadow(0 0 8px currentColor);
-        }
-
-        .node circle.glow {
+        .node circle.corona,
+        .node circle.core-hi {
             pointer-events: none;
-            fill: none;
-            stroke: none;
-            opacity: 0.35;
-            transition: opacity 0.3s;
         }
 
+        .node circle.corona {
+            transition: opacity 0.3s var(--ease-ui);
+        }
+
+        .node:hover circle.core,
         .node:hover circle.glow {
-            opacity: 0.6;
+            filter: brightness(1.3);
         }
 
-        .node.dragging circle.glow {
-            filter: none !important;
-            opacity: 0.35;
+        .node:hover circle.halo {
+            opacity: 1.15;
         }
 
-        .node.dragging circle.core {
+        .node.dragging circle.core,
+        .node.dragging circle.glow,
+        .node.dragging circle.halo {
             transition: none !important;
-            filter: none !important;
-        }
-
-        .node.dragging:hover circle.core {
             filter: none !important;
         }
 
@@ -217,7 +243,7 @@
             pointer-events: none;
             text-anchor: middle;
             font-family: 'IBM Plex Mono', monospace;
-            fill: var(--ink-soft);
+            fill: #d4e4fa;
             transition: opacity 0.3s;
             paint-order: stroke;
             stroke: rgba(3, 6, 14, 0.92);
@@ -229,7 +255,7 @@
             opacity: 0.92 !important;
         }
 
-        .node.frontier circle.core {
+        .node.frontier circle.glow {
             animation: frontier-glow 3s ease-in-out infinite;
         }
 
@@ -238,23 +264,102 @@
             0%,
             100% {
                 opacity: 0.7;
-                transform: scale(1)
             }
 
             50% {
                 opacity: 1;
-                transform: scale(1.12)
             }
         }
 
-        .node.expanded circle.core {
-            stroke-width: 1.6px;
-            filter: drop-shadow(0 0 4px currentColor);
+        .node.expanded circle.glow,
+        .node.center-node circle.glow {
+            filter: brightness(1.35);
         }
 
-        .node.center-node circle.core {
-            stroke-width: 2px;
-            filter: drop-shadow(0 0 8px currentColor);
+        /* Dual-concentric focus ring — only on the selected star */
+        .focus-ring {
+            animation: nodusSelHalo 3.6s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .focus-ring circle {
+            fill: none;
+        }
+
+        .focus-ring .fr-bloom {
+            stroke: rgba(255, 255, 255, 0.26);
+            stroke-width: 5px;
+            filter: blur(4px);
+        }
+
+        .focus-ring .fr-band {
+            stroke: rgba(255, 255, 255, 0.7);
+            stroke-width: 1.6px;
+            filter: blur(1px);
+        }
+
+        .focus-ring .fr-edge {
+            stroke: rgba(255, 255, 255, 0.92);
+            stroke-width: 0.5px;
+        }
+
+        @keyframes nodusTwinkle {
+
+            0%,
+            100% {
+                opacity: 0.85;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .node circle.corona.twinkle {
+            animation-name: nodusTwinkle;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+
+        /* Perf: detail (minor) stars are tiny and the most numerous — skip their
+           idle twinkle/pulse so only the prominent field & concept stars animate.
+           Cuts per-frame gradient repaints without a visible loss. */
+        .node.tier-minor circle.corona.twinkle,
+        .node.tier-minor.frontier circle.glow {
+            animation: none !important;
+        }
+
+        @keyframes nodusFlow {
+            0% {
+                stroke-dashoffset: 360;
+            }
+
+            100% {
+                stroke-dashoffset: -360;
+            }
+        }
+
+        @keyframes nodusFlowGold {
+            0% {
+                stroke-dashoffset: 380;
+            }
+
+            100% {
+                stroke-dashoffset: -380;
+            }
+        }
+
+        @keyframes nodusSelHalo {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         .node.focus-dim circle,
@@ -278,22 +383,24 @@
             stroke-width: 2px;
         }
 
+        /* Star entrance — GPU-friendly scale pop on the inner circles. The node
+           group handles the opacity fade (see updateGraph), so this never
+           animates SVG `r` (layout-bound) or fights the per-tick g transform.
+           !important so the pop overrides the idle twinkle/frontier-glow (which
+           are more specific) for the 0.5s entrance, then those resume. */
         .node.entering circle {
-            animation: node-enter 0.5s var(--ease-ui) forwards;
+            animation: node-enter 0.5s var(--ease-ui) both !important;
+            transform-box: fill-box;
+            transform-origin: center;
         }
 
         @keyframes node-enter {
             from {
-                r: 0;
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 1;
+                transform: scale(0.3);
             }
 
             to {
-                opacity: 1;
+                transform: scale(1);
             }
         }
 
@@ -1521,10 +1628,18 @@
             margin-top: 14px;
         }
 
-        /* Perf mode indicator */
-        .perf-mode .node.frontier circle {
+        /* Perf mode — KEEP the glow (it is the star); only drop the wide faint
+           corona/halo layers + filters/motion. The field (primary) anchor stars
+           keep their bloom in both modes so crossing the threshold doesn't pop;
+           only the many small concept/detail stars are simplified. */
+        .perf-mode .node:not(.tier-primary) circle.corona,
+        .perf-mode .node:not(.tier-primary) circle.halo {
+            display: none !important;
+        }
+
+        .perf-mode .node.frontier circle,
+        .perf-mode .node.entering circle {
             animation: none !important;
-            filter: none !important;
         }
 
         .perf-mode .expand-ring {
@@ -1535,13 +1650,27 @@
             filter: none !important;
         }
 
+        .perf-mode .link.focus-curve.active {
+            filter: none !important;
+        }
+
+        .perf-mode .photon {
+            display: none !important;
+        }
+
         .perf-mode .link {
             transition: none !important;
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .node.frontier circle.core {
-                animation: none;
+
+            .node circle.corona.twinkle,
+            .node.frontier circle.glow,
+            .node.entering circle,
+            .photon,
+            .photon.photon-gold,
+            .focus-ring {
+                animation: none !important;
             }
 
             .node circle.core {
@@ -2090,8 +2219,11 @@
 
         let sim, nodeEls, linkEls, g, svgEl, zoomBehavior;
         let focusCurveEls;
+        let photonEls = null;   // flowing-light overlay on the lit constellation
         let linkNodeRefs = [];
         let currentZoom = 1;
+        let nodeScale = 1;       // 1/k counter-scale → constant-size permanent glow
+        let lastScaleK = 1;
         let selectedNodeId = null;
         let relatedLabelIds = new Set();
         let undoStack = [];       // snapshots of {visibleNodeIds, expandedNodeIds}
@@ -2134,6 +2266,29 @@
         // ===== HELPERS =====
         function nc(n) { return DC[n.domain[0]] || '#888'; }
         function nr(n) { return TYPE_SIZE[n.type] || 7; }
+
+        // ── Star rendering (visual only — never feeds the sim/collision) ──────
+        function hexA(hex, a) {
+            const n = parseInt(String(hex).slice(1), 16);
+            return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+        }
+        // Bloom radii + twinkle by node TYPE tier (Field ▸ Concept ▸ Detail).
+        function esm(n) {
+            const tier = n.type === 'field' ? 'primary' : (n.type === 'concept' ? 'secondary' : 'minor');
+            const size = tier === 'primary' ? { core: 5.0, glow: 17, halo: 33, corona: 66 }
+                : tier === 'secondary' ? { core: 2.0, glow: 7.5, halo: 16, corona: 32 }
+                    : { core: 1.1, glow: 3.4, halo: 7.5, corona: 16 };
+            // stable hash off id → desynced twinkle
+            let h = 0; const s = String(n.id);
+            for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+            h = Math.abs(h);
+            return {
+                ...size, tier,
+                glowAlpha: tier === 'primary' ? 1.0 : tier === 'secondary' ? 0.86 : 0.62,
+                twDur: (6.5 + (h % 7) * 0.9).toFixed(2),
+                twDelay: ((h % 60) / 10).toFixed(2),
+            };
+        }
         function setLoadingState(message, isError = false, showRetry = false) {
             const wrap = document.getElementById('loading');
             const textEl = document.getElementById('loading-text');
@@ -2268,6 +2423,51 @@
                     const baseLink = linkState.get(edgeKey(d));
                     return !!baseLink && baseLink.classList.contains('focus-dim');
                 });
+
+            // Flowing PHOTONS — only on the lit (active) edges, a small set, so
+            // this adds no work over the full edge list. Each rebuilt on state
+            // change; positions ride the tick alongside focusCurveEls.
+            const relColors = (window.NodusTokens && window.NodusTokens.RELATION_COLORS) || {};
+            const activeData = focusCurveEls.data().filter(d => {
+                const bl = linkState.get(edgeKey(d));
+                return bl && bl.style.display !== 'none' &&
+                    (bl.classList.contains('highlight') || bl.classList.contains('path-edge') || bl.classList.contains('focus-keep'));
+            });
+            const fcg = g.select('.focus-curves');
+            photonEls = fcg.selectAll('path.photon').data(activeData, d => edgeKey(d));
+            photonEls.exit().remove();
+            const pen = photonEls.enter().append('path');
+            photonEls = pen.merge(photonEls)
+                .attr('class', d => {
+                    const bl = linkState.get(edgeKey(d));
+                    const gold = bl && bl.classList.contains('path-edge');
+                    return 'photon' + (gold ? ' photon-gold' : '');
+                })
+                .style('stroke', d => {
+                    const bl = linkState.get(edgeKey(d));
+                    if (bl && bl.classList.contains('path-edge')) return '#f7d27d';
+                    return relColors[d.relation_type] || '#cfe0f5';
+                })
+                .attr('d', d => curvedEdgePath(d));
+
+            updateFocusRing();
+        }
+
+        // Dual-concentric focus ring on the selected star (appended to its <g>,
+        // so it rides the node transform — no per-tick cost).
+        function updateFocusRing() {
+            if (!nodeEls) return;
+            nodeEls.selectAll('.focus-ring').remove();
+            if (!selectedNodeId) return;
+            const sel = nodeEls.filter(d => d.id === selectedNodeId);
+            if (sel.empty()) return;
+            const d = sel.datum();
+            const m = esm(d);
+            const ringR = Math.max(m.halo * 0.7, m.core * 5) + 6;
+            const fr = sel.append('g').attr('class', 'focus-ring').attr('pointer-events', 'none');
+            fr.append('circle').attr('class', 'fr-bloom').attr('r', ringR + 3);
+            fr.append('circle').attr('class', 'fr-band').attr('r', ringR);
+            fr.append('circle').attr('class', 'fr-edge').attr('r', ringR - 4);
         }
 
         function setupTopChrome() {
@@ -2890,6 +3090,36 @@
             gradFb.append('stop').attr('offset', '55%').attr('stop-color', '#888').attr('stop-opacity', 0.4);
             gradFb.append('stop').attr('offset', '100%').attr('stop-color', '#888').attr('stop-opacity', 0.08);
 
+            // Layered STAR gradients per domain (+ default): white-hot core →
+            // tight colored glow → mid halo → faint corona. brightness IS body.
+            function starStops(id, stops) {
+                const gr = defs.append('radialGradient').attr('id', id).attr('cx', '50%').attr('cy', '50%').attr('r', '50%');
+                stops.forEach(([off, col, op]) => {
+                    const s = gr.append('stop').attr('offset', off).attr('stop-color', col);
+                    if (op != null) s.attr('stop-opacity', op);
+                });
+            }
+            const starDomains = { ...DC, default: '#8aa0bf' };
+            Object.entries(starDomains).forEach(([domain, color]) => {
+                starStops('core-' + domain, [
+                    ['0%', '#ffffff', 1], ['22%', '#ffffff', 0.98], ['48%', '#ffffff', 0.78],
+                    ['70%', hexA(color, 0.55)], ['88%', hexA(color, 0.22)], ['100%', hexA(color, 0)],
+                ]);
+                starStops('glow-' + domain, [
+                    ['0%', hexA(color, 0.92)], ['24%', hexA(color, 0.58)], ['55%', hexA(color, 0.18)], ['100%', hexA(color, 0)],
+                ]);
+                starStops('halo-' + domain, [
+                    ['0%', hexA(color, 0.32)], ['38%', hexA(color, 0.13)], ['78%', hexA(color, 0.035)], ['100%', hexA(color, 0)],
+                ]);
+                starStops('corona-' + domain, [
+                    ['0%', hexA(color, 0)], ['30%', hexA(color, 0.035)], ['65%', hexA(color, 0.012)], ['100%', hexA(color, 0)],
+                ]);
+            });
+            // Edge glow filter — fluorescent halo for the lit constellation.
+            const eglow = defs.append('filter').attr('id', 'edge-glow').attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
+            eglow.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', '1.4').attr('result', 'eb');
+            eglow.append('feMerge').selectAll('feMergeNode').data(['eb', 'SourceGraphic']).enter().append('feMergeNode').attr('in', d => d);
+
             g = svgEl.append('g');
 
             zoomBehavior = d3.zoom()
@@ -2897,6 +3127,13 @@
                 .on('zoom', e => {
                     g.attr('transform', e.transform);
                     currentZoom = e.transform.k;
+                    // Constant apparent size: counter-scale by 1/k so the glow is
+                    // a permanent fixed-size part of each star. Skip on pure pan.
+                    if (e.transform.k !== lastScaleK) {
+                        lastScaleK = e.transform.k;
+                        nodeScale = Math.min(12, Math.max(0.15, 1 / e.transform.k));
+                        if (nodeEls) nodeEls.attr('transform', d => `translate(${d.x},${d.y}) scale(${nodeScale})`);
+                    }
                     updateLabels();
                     updateZoomIndicator();
                     applyLinkLOD();
@@ -2944,8 +3181,23 @@
             if (focusCurveEls) {
                 focusCurveEls.attr('d', d => curvedEdgePath(d));
             }
+            if (photonEls) {
+                photonEls.attr('d', d => curvedEdgePath(d));
+            }
             if (nodeEls) {
-                nodeEls.attr('transform', d => `translate(${d.x},${d.y})`);
+                nodeEls.attr('transform', d => `translate(${d.x},${d.y}) scale(${nodeScale})`);
+            }
+            // Ease-to-rest: ramp friction up near the stopping point so the layout
+            // glides to a halt instead of freezing. Stop time / final layout
+            // unchanged; auto-resets to base friction when re-heated (expand/drag).
+            if (sim) {
+                const a = sim.alpha();
+                if (a < 0.02) {
+                    const tt = Math.min(1, (0.02 - a) / 0.019);
+                    sim.velocityDecay(0.4 + tt * 0.5);
+                } else if (sim.velocityDecay() !== 0.4) {
+                    sim.velocityDecay(0.4);
+                }
             }
         }
 
@@ -3062,30 +3314,51 @@
                 .on('mousemove', (e, d) => moveTooltip(e))
                 .on('mouseleave', () => hideTooltip());
 
+            // STAR BODY — corona → halo → glow → core → core-hi (centred at 0,0;
+            // the node <g> transform carries them, so the tick is untouched).
+            nodeEnter.append('circle')
+                .attr('class', 'corona twinkle')
+                .attr('r', d => esm(d).corona)
+                .style('fill', d => `url(#corona-${d.domain[0] || 'default'})`)
+                .style('pointer-events', 'none')
+                .style('animation-duration', d => `${esm(d).twDur}s`)
+                .style('animation-delay', d => `${esm(d).twDelay}s`);
+
+            nodeEnter.append('circle')
+                .attr('class', 'halo')
+                .attr('r', d => esm(d).halo)
+                .style('fill', d => `url(#halo-${d.domain[0] || 'default'})`)
+                .style('pointer-events', 'none');
+
             nodeEnter.append('circle')
                 .attr('class', 'glow')
-                .attr('r', d => nr(d) + 4)
-                .style('fill', d => nc(d))
-                .style('opacity', d => d.type === 'field' ? 0.25 : 0.15)
-                .attr('filter', 'url(#glow)');
+                .attr('r', d => esm(d).glow)
+                .style('fill', d => `url(#glow-${d.domain[0] || 'default'})`)
+                .style('opacity', d => esm(d).glowAlpha)
+                .style('pointer-events', 'none');
 
             nodeEnter.append('circle')
                 .attr('class', 'core')
-                .attr('r', d => nr(d))
-                .style('fill', d => `url(#grad-${d.domain[0] || 'default'})`)
-                .style('stroke', d => nc(d))
+                .attr('r', d => esm(d).core)
+                .style('fill', d => `url(#core-${d.domain[0] || 'default'})`)
                 .style('color', d => nc(d));
 
-            // Expand ring for frontier nodes
+            nodeEnter.append('circle')
+                .attr('class', 'core-hi')
+                .attr('r', d => Math.max(0.7, esm(d).core * 0.42))
+                .style('fill', '#ffffff')
+                .style('pointer-events', 'none');
+
+            // Expand ring for frontier nodes (functional affordance — kept)
             nodeEnter.append('circle')
                 .attr('class', 'expand-ring')
-                .attr('r', d => nr(d) + 6);
+                .attr('r', d => Math.max(nr(d) + 6, esm(d).glow + 4));
 
             nodeEnter.append('text')
                 .text(d => nodeLabel(d))
-                .attr('dy', d => nr(d) + 12)
-                .style('font-size', d => d.type === 'field' ? '10px' : '8px')
-                .style('fill', d => nc(d))
+                .attr('dy', d => Math.max(esm(d).halo * 0.5, nr(d) + 12))
+                .style('font-size', d => d.type === 'field' ? '11px' : '10px')
+                .style('fill', '#d4e4fa')
                 .style('opacity', 0);
 
             // Neighbor count badge for frontier nodes
@@ -3097,22 +3370,30 @@
                     return count > 0 ? `+${count}` : '';
                 });
 
+            // Entrance: opacity fade (the scale pop is driven by the .entering
+            // class, added below after the class attribute is rebuilt).
             nodeEnter.transition().duration(350).style('opacity', 1);
 
             nodeEls = nodeEnter.merge(nodeEls);
 
             // Update classes for existing nodes
             nodeEls.attr('class', d => {
-                let cls = 'node';
+                let cls = 'node tier-' + esm(d).tier;
                 if (expandedNodeIds.has(d.id)) cls += ' expanded';
                 else cls += ' frontier';
                 if (d.id === selectedNodeId) cls += ' center-node';
                 return cls;
             });
 
+            // Trigger the scale-pop entrance now that .attr('class') (which would
+            // otherwise wipe it) has run. Drop the class once the 0.5s animation
+            // finishes so circles revert to their resting styles.
+            nodeEnter.classed('entering', true);
+            setTimeout(() => nodeEnter.classed('entering', false), 560);
+
             // Update expand ring visibility
             nodeEls.select('.expand-ring')
-                .attr('r', d => nr(d) + 6)
+                .attr('r', d => Math.max(nr(d) + 6, esm(d).glow + 4))
                 .style('display', d => expandedNodeIds.has(d.id) ? 'none' : null);
 
             // Update neighbor count badges
@@ -4346,7 +4627,11 @@
         // ===== PERFORMANCE MODE =====
         function updatePerfMode() {
             const n = visibleNodeIds.size;
-            document.documentElement.classList.toggle('perf-mode', n > 150);
+            const on = document.documentElement.classList.contains('perf-mode');
+            // Hysteresis: OFF→ON above 180, ON→OFF below 140 — avoids flicker
+            // when the visible count hovers around the threshold.
+            if (!on && n > 180) document.documentElement.classList.add('perf-mode');
+            else if (on && n < 140) document.documentElement.classList.remove('perf-mode');
         }
 
         // ===== INIT =====

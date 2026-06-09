@@ -29,11 +29,12 @@
     <meta name="twitter:image" content="/favicon.svg">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <title>Nodus - Deep Field Survey</title>
+    <link rel="stylesheet" href="/nodus-fonts.css">
     <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="/src/index-tailwind.css">
     <style>
         body {
-            font-family: 'Sora', sans-serif;
+            font-family: var(--font-body);
             background-color: #070a0f;
         }
 
@@ -261,7 +262,7 @@
 
         .pill-tooltip-title {
             margin-top: 8px;
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: var(--font-tooltip-title);
             font-size: 16px;
             color: rgba(244, 248, 255, 0.96);
         }
@@ -443,11 +444,12 @@
             <section class="text-center px-2">
                 <p id="heroKicker" class="font-label-code text-label-code text-on-surface/60 tracking-[0.14em] mb-3">
                     LEARN FASTER</p>
-                <h1 id="heroTitle" class="font-display-lg-mobile md:font-display-lg text-on-surface leading-tight mb-3">
+                <h1 id="heroTitle"
+                    class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface leading-tight mb-3">
                     Turn complex topics into
                     <span class="text-primary">clear learning paths</span>
                 </h1>
-                <p id="heroSubtitle" class="font-body-base text-on-surface/70 max-w-xl mx-auto">
+                <p id="heroSubtitle" class="font-body-base text-body-base text-on-surface/70 max-w-xl mx-auto">
                     Search once, see prerequisite links instantly, and move from a concept to your next study step in
                     seconds.
                 </p>

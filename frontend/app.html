@@ -32,6 +32,7 @@
     <link rel="preload" href="/api/graph/full" as="fetch" crossorigin>
     <title>Knowledge Graph — Nodus</title>
     <script src="/vendor/d3.min.js" defer></script>
+    <link rel="stylesheet" href="/nodus-fonts.css">
     <link rel="stylesheet" href="/nodus-theme.css">
     <link rel="stylesheet" href="src/shared.css">
     <style>
@@ -149,10 +150,15 @@
             cursor: grabbing
         }
 
-        /* Links — colours defined in src/shared.css */
+        /* ── Constellation lines (edges) — colours defined in src/shared.css ──
+           At rest: faint semantic-coloured hairlines so the sky stays mostly
+           dark. The lit constellation (focus curves) gains the fluorescent
+           glow + a flowing photon. */
         .link {
-            stroke-opacity: 0.018;
+            stroke-opacity: 0.10;
             stroke-width: 0.5px;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
             fill: none
         }
 
@@ -168,7 +174,7 @@
         }
 
         .link.dimmed-link {
-            stroke-opacity: 0.005
+            stroke-opacity: 0.03
         }
 
         .focus-curves {
@@ -177,73 +183,101 @@
 
         .link.focus-curve {
             stroke-opacity: 0;
-            stroke-width: 1.9px;
+            stroke-width: 1.1px;
             fill: none;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
             transition: stroke-opacity 0.2s ease
         }
 
         .link.focus-curve.active {
-            stroke-opacity: 0.9
+            stroke-opacity: 0.85;
+            filter: url(#edge-glow)
         }
 
         .link.focus-curve.prereq-path {
             stroke: #f0c050 !important;
-            stroke-opacity: 0.94;
-            stroke-width: 2px
+            stroke-opacity: 0.92;
+            stroke-width: 1.4px
         }
 
-        /* Nodes */
-        .node circle.core {
-            cursor: pointer;
-            stroke-width: 1.2px;
+        /* Flowing photon — one long luminous dash glides the lit edge, vanishes,
+           returns. Heavy drop-shadow makes it read as a diffuse band of light. */
+        .photon {
+            fill: none;
+            stroke-width: 1.1px;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+            stroke-dasharray: 60 640;
+            animation: nodusFlow 3.6s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.28))
+        }
+
+        .photon.photon-gold {
+            stroke-width: 0.95px;
+            stroke-dasharray: 54 680;
+            animation: nodusFlowGold 4.4s ease-in-out infinite;
+            filter: drop-shadow(0 0 3px rgba(247, 210, 125, 0.5)) drop-shadow(0 0 6px rgba(247, 210, 125, 0.24))
+        }
+
+        /* ── Stars (nodes) — brightness IS the body; hover/select BRIGHTEN, never
+           grow. corona/halo/glow/core/core-hi stack outside-in. */
+        .node circle.hit {
+            cursor: pointer
+        }
+
+        .node circle.core,
+        .node circle.glow,
+        .node circle.halo {
+            pointer-events: none;
             transition: filter 0.18s, opacity 0.3s
         }
 
-        .node circle.glow {
-            pointer-events: none;
-            opacity: 0.5;
+        .node circle.corona {
+            pointer-events: none
         }
 
-        .node:hover circle.core {
-            filter: brightness(1.55)
+        .node circle.core-hi,
+        .node circle.state-mark {
+            pointer-events: none
         }
 
+        .node circle.state-mark {
+            fill: transparent
+        }
+
+        .node:hover circle.core,
         .node:hover circle.glow {
-            opacity: 0.8;
+            filter: brightness(1.3)
         }
 
-        .node.dragging circle.glow {
-            filter: none !important;
+        .node:hover circle.halo {
+            opacity: 1.15
         }
 
-        .node.dragging circle.core {
+        .node.dragging circle.core,
+        .node.dragging circle.glow,
+        .node.dragging circle.halo {
             transition: none !important;
-            filter: none !important;
-        }
-
-        .node.dragging:hover circle.core {
-            filter: none !important;
+            filter: none !important
         }
 
         .node.selected-node circle.glow {
-            opacity: 0.96;
+            filter: brightness(1.4)
         }
 
         .node.selected-node circle.core {
-            filter: brightness(1.45);
-            stroke-width: 2.4px;
-        }
-
-        .node.selected-node.available circle.core {
-            animation: none;
-            opacity: 1;
-            transform: scale(1);
+            filter: brightness(1.25)
         }
 
         .node text {
             pointer-events: none;
             text-anchor: middle;
             font-family: 'IBM Plex Mono', monospace;
+            paint-order: stroke;
+            stroke: rgba(4, 7, 12, 0.92);
+            stroke-width: 3px;
+            stroke-linejoin: round;
             transition: opacity 0.3s
         }
 
@@ -251,65 +285,153 @@
             opacity: 0.92 !important
         }
 
-        .node.dimmed circle.core {
-            opacity: 0.06
-        }
-
-        .node.dimmed circle.glow {
-            opacity: 0
+        .node.dimmed {
+            opacity: 0.12;
+            transition: opacity 0.4s
         }
 
         .node.dimmed text {
             opacity: 0 !important
         }
 
-        .node.learned circle.core {
-            stroke: #4ade80;
-            stroke-width: 2.5px
+        /* learned = soft aqua tick · available = pulsing gold mark (on .state-mark,
+           so the white-hot core stays a clean star) */
+        .node.learned circle.state-mark {
+            fill: rgba(150, 230, 215, 0.95)
         }
 
-        .node.available circle.core {
-            stroke: #fbbf24;
-            stroke-width: 2px;
+        .node.available circle.state-mark {
+            fill: #fbbf24;
             animation: pulse 1.5s infinite
         }
 
-        .node.on-path circle.core {
-            stroke-width: 2.5px;
-            opacity: 1
+        .node.on-path circle.glow {
+            filter: brightness(1.3)
+        }
+
+        /* Dual-concentric focus ring — only on the selected star */
+        .focus-ring {
+            animation: nodusSelHalo 3.6s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center
+        }
+
+        .focus-ring circle {
+            fill: none
+        }
+
+        .focus-ring .fr-bloom {
+            stroke: rgba(255, 255, 255, 0.26);
+            stroke-width: 5px;
+            filter: blur(4px)
+        }
+
+        .focus-ring .fr-band {
+            stroke: rgba(255, 255, 255, 0.7);
+            stroke-width: 1.6px;
+            filter: blur(1px)
+        }
+
+        .focus-ring .fr-edge {
+            stroke: rgba(255, 255, 255, 0.92);
+            stroke-width: 0.5px
         }
 
         @keyframes pulse {
 
             0%,
             100% {
-                opacity: 0.7;
-                transform: scale(1)
+                opacity: 0.7
             }
 
             50% {
-                opacity: 1;
-                transform: scale(1.15)
+                opacity: 1
+            }
+        }
+
+        @keyframes nodusTwinkle {
+
+            0%,
+            100% {
+                opacity: 0.85
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        .node circle.corona.twinkle {
+            animation-name: nodusTwinkle;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out
+        }
+
+        @keyframes nodusFlow {
+            0% {
+                stroke-dashoffset: 360
+            }
+
+            100% {
+                stroke-dashoffset: -360
+            }
+        }
+
+        @keyframes nodusFlowGold {
+            0% {
+                stroke-dashoffset: 380
+            }
+
+            100% {
+                stroke-dashoffset: -380
+            }
+        }
+
+        @keyframes nodusSelHalo {
+
+            0%,
+            100% {
+                opacity: 0.6
+            }
+
+            50% {
+                opacity: 1
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .node.available circle.core {
-                animation: none;
-                opacity: 0.85
+
+            .node circle.corona.twinkle,
+            .photon,
+            .photon.photon-gold,
+            .focus-ring,
+            .node.available circle.state-mark {
+                animation: none !important
             }
         }
 
-        /* Performance mode — auto-activated on low-end devices */
-        .perf-mode .node circle.glow {
+        /* Performance mode — auto-activated on low-end devices. KEEP the glow
+           (it is the star); only drop the wide faint corona/halo layers, the
+           twinkle, photons, and filters. Stars still glow, just cheaper. */
+        .perf-mode .node circle.corona,
+        .perf-mode .node circle.halo {
             display: none
         }
 
-        .perf-mode .node circle.core {
+        .perf-mode .node circle.core,
+        .perf-mode .node circle.glow {
             filter: none !important
         }
 
-        .perf-mode .node.available circle.core {
+        .perf-mode .link.focus-curve.active {
+            filter: none !important
+        }
+
+        .perf-mode .photon {
+            display: none
+        }
+
+        .perf-mode .node.available circle.state-mark {
             animation: none !important
         }
 

@@ -8,4 +8,134 @@
     --nodus-ease-ui: cubic-bezier(0.16, 1, 0.3, 1);
     --nodus-glass-border: rgba(255, 255, 255, 0.08);
     --nodus-glass-shadow: 0 0 20px rgba(196, 198, 206, 0.05);
+
+    /* ── Type families ─────────────────────────────────────────────────────
+       Oxanium now drives display + headlines (was Sora); Sora stays for body.
+       Space Grotesk dropped — node/tooltip titles use Oxanium. */
+    --font-display:       'Oxanium', system-ui, sans-serif;          /* display + UI headlines */
+    --font-body:          'Sora', system-ui, sans-serif;             /* body text, paragraphs */
+    --font-graph-body:    'IBM Plex Sans', system-ui, sans-serif;    /* graph-view prose */
+    --font-label:         'JetBrains Mono', ui-monospace, monospace; /* chrome labels, wordmark */
+    --font-mono:          'IBM Plex Mono', ui-monospace, monospace;  /* graph data, code */
+    --font-tooltip-title: 'Oxanium', system-ui, sans-serif;          /* tooltip / node titles */
+
+    /* ── Fluid text scale  (375px → 1440px) ────────────────────────────────
+       T-shirt steps: 2xs · xs · sm · base · md · lg · xl · 2xl · 3xl · 4xl */
+    --text-2xs:  clamp(10px, calc(0.094vw +  9.65px), 11px);
+    --text-xs:   clamp(11px, calc(0.094vw + 10.65px), 12px);
+    --text-sm:   clamp(13px, calc(0.094vw + 12.65px), 14px);
+    --text-base: clamp(15px, calc(0.188vw + 14.30px), 17px);
+    --text-md:   clamp(17px, calc(0.282vw + 15.94px), 20px);
+    --text-lg:   clamp(20px, calc(0.751vw + 17.18px), 28px);
+    --text-xl:   clamp(26px, calc(1.315vw + 21.07px), 40px);
+    --text-2xl:  clamp(34px, calc(2.066vw + 26.25px), 56px);
+    --text-3xl:  clamp(44px, calc(2.629vw + 34.14px), 72px);
+    --text-4xl:  clamp(56px, calc(3.756vw + 41.92px), 96px);
+
+    /* ── Leading (line-height) ─────────────────────────────────────────────── */
+    --leading-none:    1;
+    --leading-tight:   1.1;
+    --leading-snug:    1.25;
+    --leading-normal:  1.5;
+    --leading-relaxed: 1.6;
+    --leading-loose:   1.75;
+
+    /* ── Tracking (letter-spacing) ─────────────────────────────────────────── */
+    --tracking-tight:   -0.025em;
+    --tracking-snug:    -0.01em;
+    --tracking-normal:  0em;
+    --tracking-wide:     0.06em;
+    --tracking-wider:    0.1em;
+    --tracking-widest:   0.14em;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEMANTIC TYPE RAMP  —  .type-* classes
+   Prefer these going forward. Legacy .display-lg / .body-base aliases below.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Display — Oxanium, futuristic character ───────────────────────────── */
+.type-display {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl); line-height: var(--leading-none);
+    letter-spacing: var(--tracking-tight); font-weight: 700;
+}
+.type-display-sm {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl); line-height: var(--leading-tight);
+    letter-spacing: -0.02em; font-weight: 700;
+}
+
+/* ── Headline — Oxanium ────────────────────────────────────────────────── */
+.type-headline-lg {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl); line-height: var(--leading-tight);
+    letter-spacing: -0.015em; font-weight: 700;
+}
+.type-headline {
+    font-family: var(--font-display);
+    font-size: var(--text-xl); line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-snug); font-weight: 600;
+}
+.type-headline-sm {
+    font-family: var(--font-display);
+    font-size: var(--text-lg); line-height: 1.3;
+    font-weight: 600;
+}
+
+/* ── Body — Sora ───────────────────────────────────────────────────────── */
+.type-body-lg {
+    font-family: var(--font-body);
+    font-size: var(--text-md); line-height: var(--leading-relaxed);
+    font-weight: 400;
+}
+.type-body {
+    font-family: var(--font-body);
+    font-size: var(--text-base); line-height: var(--leading-relaxed);
+    font-weight: 400;
+}
+.type-body-sm {
+    font-family: var(--font-body);
+    font-size: var(--text-sm); line-height: var(--leading-normal);
+    font-weight: 400;
+}
+
+/* ── Label — JetBrains Mono ────────────────────────────────────────────── */
+.type-label {
+    font-family: var(--font-label);
+    font-size: var(--text-sm); line-height: 1.4;
+    font-weight: 400;
+}
+.type-label-caps {
+    font-family: var(--font-label);
+    font-size: var(--text-xs); line-height: 1;
+    letter-spacing: var(--tracking-wider); font-weight: 500;
+    text-transform: uppercase;
+}
+.type-micro {
+    font-family: var(--font-label);
+    font-size: var(--text-2xs); line-height: 1;
+    letter-spacing: var(--tracking-wide);
+}
+
+/* ── Code / Graph — IBM Plex Mono ──────────────────────────────────────── */
+.type-code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm); line-height: var(--leading-normal);
+    font-weight: 400;
+}
+.type-graph-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs); letter-spacing: 0.04em;
+    font-weight: 400;
+}
+
+/* ── Legacy aliases — deprecated; prefer .type-* above ─────────────────── */
+.display-lg        { font-family: var(--font-display); font-size: var(--text-4xl); line-height: var(--leading-none); letter-spacing: var(--tracking-tight); font-weight: 700; }
+.display-lg-mobile { font-family: var(--font-display); font-size: var(--text-2xl); line-height: var(--leading-tight); font-weight: 700; }
+.headline-md       { font-family: var(--font-display); font-size: var(--text-lg); line-height: 1.25; font-weight: 600; }
+.body-base         { font-family: var(--font-body); font-size: var(--text-base); line-height: var(--leading-relaxed); }
+.body-sm           { font-family: var(--font-body); font-size: var(--text-sm); line-height: var(--leading-normal); }
+.label-code        { font-family: var(--font-label); font-size: var(--text-sm); line-height: 1.4; }
+.label-caps        { font-family: var(--font-label); font-size: var(--text-xs); letter-spacing: var(--tracking-wider); font-weight: 500; text-transform: uppercase; }
+.graph-data-label  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.05em; }

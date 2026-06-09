@@ -69,22 +69,25 @@ module.exports = {
                 'margin-desktop': '64px'
             },
             fontFamily: {
-                'headline-md': ['Sora'],
+                // Display + headlines now ride Oxanium (was Sora); body stays Sora.
+                'headline-md': ['Oxanium'],
                 'label-caps': ['JetBrains Mono'],
                 'body-base': ['Sora'],
-                'display-lg-mobile': ['Sora'],
-                'display-lg': ['Sora'],
+                'display-lg-mobile': ['Oxanium'],
+                'display-lg': ['Oxanium'],
                 'body-sm': ['Sora'],
                 'label-code': ['JetBrains Mono']
             },
             fontSize: {
-                'headline-md': ['24px', { lineHeight: '1.3', fontWeight: '600' }],
-                'label-caps': ['12px', { lineHeight: '1', letterSpacing: '0.1em', fontWeight: '500' }],
-                'body-base': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
-                'display-lg-mobile': ['32px', { lineHeight: '1.2', fontWeight: '700' }],
-                'display-lg': ['48px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
-                'body-sm': ['14px', { lineHeight: '1.5', fontWeight: '400' }],
-                'label-code': ['13px', { lineHeight: '1.4', fontWeight: '400' }]
+                // Sizes resolve to the fluid clamp() tokens in nodus-theme.css so the
+                // existing index.html utility classes scale 375px→1440px with no markup change.
+                'headline-md': ['var(--text-lg)', { lineHeight: '1.3', fontWeight: '600' }],
+                'label-caps': ['var(--text-xs)', { lineHeight: '1', letterSpacing: '0.1em', fontWeight: '500' }],
+                'body-base': ['var(--text-base)', { lineHeight: '1.6', fontWeight: '400' }],
+                'display-lg-mobile': ['var(--text-2xl)', { lineHeight: '1.2', fontWeight: '700' }],
+                'display-lg': ['var(--text-4xl)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+                'body-sm': ['var(--text-sm)', { lineHeight: '1.5', fontWeight: '400' }],
+                'label-code': ['var(--text-sm)', { lineHeight: '1.4', fontWeight: '400' }]
             }
         }
     }

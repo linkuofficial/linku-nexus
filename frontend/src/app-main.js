@@ -825,7 +825,6 @@ function refreshFocusCurves() {
             return cls;
         })
         .attr('marker-end', (d, i) => activeEdges[i].isPrereq ? 'url(#arrow)' : null)
-        .style('filter', 'url(#edge-glow)')   // faint fluorescent halo on the lit backbone
         .attr('d', d => curvedEdgePath(d));
     // Photon — a single long luminous dash gliding the edge (CSS-animated).
     focusCurveG.selectAll('path.photon').data(activeEdges.map(a => a.edge)).enter().append('path')

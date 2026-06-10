@@ -7,8 +7,15 @@ import { test, expect } from "@playwright/test";
  * full-page pixel diffs are flaky. Instead we snapshot getComputedStyle() of the
  * chrome elements — these are deterministic and are exactly what the refactor
  * must keep byte-identical. First run writes the baseline snapshot; later runs
- * fail if any captured property drifts. Run BEFORE and AFTER the refactor:
- *   npx playwright test visual-styles
+ * fail if any captured property drifts.
+ *
+ * Tagged @visual and EXCLUDED from the CI `test:e2e` run: the committed
+ * snapshots are platform-specific (win32 only) and these are a local before/
+ * after oracle for deliberate style changes, not a portable CI gate. Run it
+ * manually on your dev machine (regenerate baselines with -u after an
+ * intentional style change):
+ *   npm run test:e2e:visual
+ *   npm run test:e2e:visual -- -u   # update baselines for your platform
  */
 
 const PROPS = [
@@ -46,7 +53,7 @@ function asSnapshot(label: string, data: unknown) {
     return JSON.stringify({ label, data }, null, 2);
 }
 
-test("index.html chrome computed styles", async ({ page }) => {
+test("index.html chrome computed styles", { tag: "@visual" }, async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     await freezeMotion(page);
@@ -59,7 +66,7 @@ test("index.html chrome computed styles", async ({ page }) => {
     expect(asSnapshot("index", await snap(page, sels))).toMatchSnapshot("index-styles.json");
 });
 
-test("app.html chrome computed styles", async ({ page }) => {
+test("app.html chrome computed styles", { tag: "@visual" }, async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem("nodus-app-onboard-seen-v1", "1"));
     await page.goto("/app.html");
     await page.waitForLoadState("networkidle");
@@ -76,7 +83,7 @@ test("app.html chrome computed styles", async ({ page }) => {
     expect(asSnapshot("app", await snap(page, sels))).toMatchSnapshot("app-styles.json");
 });
 
-test("explorer.html chrome computed styles", async ({ page }) => {
+test("explorer.html chrome computed styles", { tag: "@visual" }, async ({ page }) => {
     await page.goto("/explorer.html");
     await page.waitForLoadState("networkidle");
     await freezeMotion(page);

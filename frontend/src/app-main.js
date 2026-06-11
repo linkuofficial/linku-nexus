@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 // ===== I18N =====
 // All translation data lives in ./i18n.js (which re-exports ./i18n/{lang}.js).
 import { I18N, isValidLang, getLang, TAG_LABELS, TAG_TOKEN_ZH, TAG_TOKEN_JA } from './i18n.js';

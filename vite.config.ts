@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import { copyFileSync, mkdirSync, readdirSync, existsSync } from 'fs';
+import { copyFileSync, mkdirSync, readdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 
 function copyDataPlugin() {
     return {
@@ -9,7 +9,28 @@ function copyDataPlugin() {
             const srcDir = resolve(__dirname, 'data');
             const destDir = resolve(__dirname, 'frontend/public/data');
             mkdirSync(destDir, { recursive: true });
-            copyFileSync(resolve(srcDir, 'all_nodes.json'), resolve(destDir, 'all_nodes.json'));
+
+            // Split the monolithic graph payload into "topology" (everything the
+            // graph needs to render — ids, labels, types, domains, connections) and
+            // "descriptions" (the heavy English prose, ~780kB). The runtime loads
+            // topology first and streams descriptions in afterwards, so the critical
+            // first parse stays small. The source of truth in data/ is left intact;
+            // both derived files land in the gitignored public/data.
+            const raw = JSON.parse(readFileSync(resolve(srcDir, 'all_nodes.json'), 'utf8'));
+            const nodes = (Array.isArray(raw) ? raw : raw.nodes) as any[];
+            const descriptions: Record<string, string> = {};
+            const slimNodes = nodes.map((n: any) => {
+                if (n && typeof n.description === 'string' && n.description) {
+                    descriptions[n.id] = n.description;
+                    const { description, ...rest } = n;
+                    return rest;
+                }
+                return n;
+            });
+            const slim = Array.isArray(raw) ? slimNodes : { ...raw, nodes: slimNodes };
+            writeFileSync(resolve(destDir, 'all_nodes.json'), JSON.stringify(slim));
+            writeFileSync(resolve(destDir, 'descriptions.json'), JSON.stringify(descriptions));
+
             const i18nSrc = resolve(srcDir, 'i18n');
             const i18nDest = resolve(destDir, 'i18n');
             if (existsSync(i18nSrc)) {

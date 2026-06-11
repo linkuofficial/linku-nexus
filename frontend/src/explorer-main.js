@@ -237,6 +237,7 @@ import * as d3 from "d3";
         let LANG = 'en';
         let labelMap = {};
         let descriptionMap = {};
+        let enDescriptionMap = {}; // English descriptions, split out of all_nodes.json and streamed in
         let localeLoadSeq = 0;
         const localeMapsCache = {
             en: { labels: {}, descriptions: {} }
@@ -888,7 +889,7 @@ import * as d3 from "d3";
         function nodeDescription(n) {
             if (!n) return '';
             if (LANG !== 'en' && descriptionMap[n.id]) return descriptionMap[n.id];
-            return n.description || '';
+            return n.description || enDescriptionMap[n.id] || '';
         }
 
         async function fetchLocaleLabels(locale) {
@@ -2704,6 +2705,17 @@ import * as d3 from "d3";
                 updateFocusButton();
                 restoreState();
                 setTimeout(() => startTour(false), 280);
+
+                // English descriptions are split out of all_nodes.json at build time
+                // and streamed in after the graph is interactive. Until they arrive,
+                // nodeDescription() simply returns '' for English; once loaded, refresh
+                // any open panel so its prose fills in.
+                fetchJsonWithTimeout('../data/descriptions.json', 7000)
+                    .then((map) => {
+                        enDescriptionMap = (map && typeof map === 'object') ? map : {};
+                        if (selectedNodeId && nodeMap[selectedNodeId]) openPanel(nodeMap[selectedNodeId]);
+                    })
+                    .catch(() => { /* descriptions are non-critical */ });
             } catch (error) {
                 lastLoadError = error;
                 const msg = error && error.message ? error.message : 'Unable to initialize explorer.';

@@ -465,17 +465,13 @@ async function init() {
         }
     }
 
-    // Load graph data from API (fallback to static JSON)
-    // Load descriptions in parallel (non-blocking)
+    // Load the graph topology first so the constellation can render as soon as
+    // possible. The heavier English descriptions are split into their own payload
+    // and streamed in afterwards (see the enrichment call at the end of init).
     let data;
     try {
         setLoadingState(t('loadingGraph'));
-        const [graphResult, descResult] = await Promise.all([
-            loadGraphData(),
-            window.NodusApi.fetchGraphDescriptions(),
-        ]);
-        data = graphResult;
-        enDescriptionMap = descResult;
+        data = await loadGraphData();
     } catch (e) {
         setLoadingState('Unable to load graph data. Please retry.', true, true);
         return;
@@ -540,6 +536,15 @@ async function init() {
     setupLPMode();
     applyI18n();
     setupGuides();
+
+    // Stream English descriptions in after the graph is interactive. Until they
+    // land, label/id/tag/domain search all work; once they arrive we re-index so
+    // full-text search lights up and refresh any panel that's already open.
+    window.NodusApi.fetchGraphDescriptions().then((map) => {
+        enDescriptionMap = map || {};
+        rebuildSearchIndex();
+        if (currentPanelNodeId && nodeMap[currentPanelNodeId]) openPanel(nodeMap[currentPanelNodeId]);
+    }).catch(() => { /* descriptions are non-critical */ });
 }
 
 function setupTopChrome() {

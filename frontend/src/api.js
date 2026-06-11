@@ -127,8 +127,18 @@
     }
 
     async function fetchGraphDescriptions() {
-        // Descriptions are embedded in each node's .description field from all_nodes.json.
-        return {};
+        // English descriptions are split out of all_nodes.json at build time into a
+        // separate payload (see vite.config copyDataPlugin) and streamed in after
+        // the graph is interactive. Returns a { [nodeId]: description } map; an empty
+        // map on failure keeps the graph fully usable (descriptions are non-critical).
+        return dedupedCachedFetch("descriptions", CACHE_TTL_MS.descriptions, async () => {
+            try {
+                const map = await fetchJsonWithRetry("/data/descriptions.json", 1);
+                return map && typeof map === "object" ? map : {};
+            } catch (error) {
+                return {};
+            }
+        });
     }
 
     async function fetchLocaleLabels(locale) {

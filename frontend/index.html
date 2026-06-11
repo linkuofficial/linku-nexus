@@ -65,37 +65,32 @@
 
     <!-- Main Canvas -->
     <main
-        class="relative z-10 w-full h-screen flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop pointer-events-none">
+        class="relative z-10 w-full h-screen flex flex-col items-center justify-center px-margin-mobile md:px-margin-desktop py-16 pointer-events-none">
         <!-- Search Area -->
-        <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-8 mt-16 pointer-events-auto">
+        <div class="w-full max-w-2xl mx-auto flex flex-col items-center space-y-6 sm:space-y-8 mt-10 sm:mt-16 pointer-events-auto">
             <!-- Value Proposition -->
             <section class="text-center px-2">
-                <p id="heroKicker" class="font-label-code text-label-code text-on-surface/60 tracking-[0.14em] mb-3">
-                    LEARN FASTER</p>
+                <p id="heroKicker" class="font-label-code text-label-code text-on-surface/60 tracking-[0.14em] mb-2">
+                    BEGIN ANYWHERE</p>
                 <h1 id="heroTitle"
-                    class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface leading-tight mb-3">
-                    Turn complex topics into
-                    <span class="text-primary">clear learning paths</span>
+                    class="hero-title text-on-surface mb-4">
+                    It's all <span class="text-primary">connected</span>
                 </h1>
-                <p id="heroSubtitle" class="font-body-base text-body-base text-on-surface/70 max-w-xl mx-auto">
-                    Search once, see prerequisite links instantly, and move from a concept to your next study step in
-                    seconds.
+                <p id="heroSubtitle" class="hero-subtitle font-body-base text-body-base text-on-surface/80 max-w-xl mx-auto">
+                    Follow one spark of curiosity wherever it leads.
                 </p>
             </section>
 
             <!-- Primary CTAs -->
             <div class="flex flex-col sm:flex-row gap-3 w-full justify-center">
                 <a id="ctaExplore"
-                    class="glass-pane rounded-full px-6 py-3 text-center font-label-code text-label-code text-on-surface hover:bg-surface-variant/50 transition-colors duration-300"
-                    href="app.html">Start Exploring Graph</a>
-                <button id="ctaSearch"
-                    class="glass-pane rounded-full px-6 py-3 text-center font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 transition-colors duration-300"
-                    type="button">Search Directly</button>
+                    class="glass-pane px-6 py-3 text-center font-label-code text-label-code text-on-surface transition-colors duration-300"
+                    href="app.html">Start Exploring</a>
             </div>
 
             <!-- Search Container (relative for dropdown positioning) -->
             <div class="relative w-full">
-                <div class="relative w-full glass-pane rounded-full overflow-hidden flex items-center p-2 search-glow transition-all duration-300"
+                <div class="relative w-full glass-pane search-shell overflow-hidden flex items-center p-2 search-glow transition-all duration-300"
                     id="searchContainer">
                     <span class="ml-4 text-on-surface opacity-50" aria-hidden="true">⌕</span>
                     <input id="searchInput"
@@ -105,20 +100,20 @@
                         aria-hidden="true">⟳</span>
                 </div>
                 <!-- Search Results Dropdown -->
-                <div id="searchResults" class="search-results glass-pane rounded-xl hidden"></div>
+                <div id="searchResults" class="search-results glass-pane hidden"></div>
             </div>
 
             <!-- Suggestion Pills -->
             <div id="suggestionPills" class="flex flex-wrap justify-center gap-3">
                 <button
-                    class="pill-btn px-4 py-2 glass-pane rounded-full font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors duration-300"
+                    class="pill-btn inline-flex px-4 py-2.5 glass-pane font-label-code text-label-code text-on-surface-variant hover:text-on-surface transition-colors duration-300"
                     data-query="black hole" data-domain="PHY" data-topic="blackHoles">
                     <span class="w-2 h-2 rounded-full inline-block subtle-pulse" style="background:#c97a5b"></span>
                     <span class="pill-label">Black Holes</span>
                     <span class="pill-domain">PHY</span>
                 </button>
                 <button
-                    class="pill-btn px-4 py-2 glass-pane rounded-full font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors duration-300"
+                    class="pill-btn inline-flex px-4 py-2.5 glass-pane font-label-code text-label-code text-on-surface-variant hover:text-on-surface transition-colors duration-300"
                     data-node="evolution_field" data-domain="BIO" data-topic="evolution">
                     <span class="w-2 h-2 rounded-full inline-block subtle-pulse"
                         style="background:#5bc97a;animation-delay: 0.5s;"></span>
@@ -126,7 +121,7 @@
                     <span class="pill-domain">BIO</span>
                 </button>
                 <button
-                    class="pill-btn px-4 py-2 glass-pane rounded-full font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors duration-300 hidden sm:block"
+                    class="pill-btn px-4 py-2.5 glass-pane font-label-code text-label-code text-on-surface-variant hover:text-on-surface transition-colors duration-300 hidden sm:inline-flex"
                     data-query="industrial revolution" data-domain="HIS" data-topic="industrialRevolution">
                     <span class="w-2 h-2 rounded-full inline-block subtle-pulse"
                         style="background:#a07850;animation-delay: 1s;"></span>
@@ -134,7 +129,7 @@
                     <span class="pill-domain">HIS</span>
                 </button>
                 <button
-                    class="pill-btn px-4 py-2 glass-pane rounded-full font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors duration-300"
+                    class="pill-btn inline-flex px-4 py-2.5 glass-pane font-label-code text-label-code text-on-surface-variant hover:text-on-surface transition-colors duration-300"
                     data-query="neural network" data-domain="TEC" data-topic="neuralNetworks">
                     <span class="w-2 h-2 rounded-full inline-block subtle-pulse"
                         style="background:#c95b9b;animation-delay: 1.5s;"></span>
@@ -142,7 +137,7 @@
                     <span class="pill-domain">TEC</span>
                 </button>
                 <button
-                    class="pill-btn px-4 py-2 glass-pane rounded-full font-label-code text-label-code text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors duration-300 hidden md:block"
+                    class="pill-btn px-4 py-2.5 glass-pane font-label-code text-label-code text-on-surface-variant hover:text-on-surface transition-colors duration-300 hidden md:inline-flex"
                     data-node="quantum_mechanics_field" data-domain="PHY" data-topic="quantumMechanics">
                     <span class="w-2 h-2 rounded-full inline-block subtle-pulse"
                         style="background:#c97a5b;animation-delay: 2s;"></span>
@@ -232,8 +227,6 @@
         const heroTitle = document.getElementById('heroTitle');
         const heroSubtitle = document.getElementById('heroSubtitle');
         const ctaExplore = document.getElementById('ctaExplore');
-        const ctaSearch = document.getElementById('ctaSearch');
-        const searchContainer = document.getElementById('searchContainer');
         const pillTooltip = document.getElementById('pillTooltip');
         const pillTooltipDomain = document.getElementById('pillTooltipDomain');
         const pillTooltipTitle = document.getElementById('pillTooltipTitle');
@@ -600,47 +593,33 @@
             await setLang(btn.dataset.lang);
         });
 
-        ctaSearch.addEventListener('click', () => {
-            searchInput.focus({ preventScroll: true });
-            if (searchContainer) {
-                searchContainer.classList.remove('search-cta-flash');
-                void searchContainer.offsetWidth;
-                searchContainer.classList.add('search-cta-flash');
-                setTimeout(() => searchContainer.classList.remove('search-cta-flash'), 780);
-            }
-            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-
         function applyLang() {
             const copy = {
                 en: {
-                    heroKicker: 'LEARN FASTER',
-                    heroTitle: 'Turn complex topics into<br><span class="text-primary">clear learning paths</span>',
-                    heroSubtitle: 'Search once, see prerequisite links instantly, and move from a concept to your next study step in seconds.',
-                    ctaExplore: 'Start Exploring Graph',
-                    ctaSearch: 'Search Directly',
+                    heroKicker: 'BEGIN ANYWHERE',
+                    heroTitle: 'It\'s all <span class="text-primary">connected</span>',
+                    heroSubtitle: 'Follow one spark of curiosity wherever it leads.',
+                    ctaExplore: 'Start Exploring',
                     placeholder: 'Explore the infinite...',
                     footerCopy: `© ${new Date().getFullYear()} NODUS. EXPLORE THE INFINITE.`,
                     footerGraph: 'Graph',
                     footerExplorer: 'Explorer',
                 },
                 zh: {
-                    heroKicker: '快速掌握知識脈絡',
-                    heroTitle: '把複雜主題整理成<br><span class="text-primary">清楚可走的學習路徑</span>',
-                    heroSubtitle: '一次搜尋就看到前置知識與下一步，從概念到行動只要幾秒。',
-                    ctaExplore: '開始探索圖譜',
-                    ctaSearch: '直接搜尋',
+                    heroKicker: '從任一點開始',
+                    heroTitle: '一切皆<span class="text-primary">相連</span>',
+                    heroSubtitle: '順著一絲好奇，看它通向何方。',
+                    ctaExplore: '開始探索',
                     placeholder: '探索無限知識…',
                     footerCopy: `© ${new Date().getFullYear()} NODUS．探索無限知識。`,
                     footerGraph: '圖譜',
                     footerExplorer: '探索器',
                 },
                 ja: {
-                    heroKicker: '学習をもっと速く',
-                    heroTitle: '複雑なテーマを<br><span class="text-primary">明確な学習パスに変える</span>',
-                    heroSubtitle: '一度の検索で前提知識と次の一歩を可視化し、理解から行動までを最短でつなぎます。',
-                    ctaExplore: 'グラフ探索を開始',
-                    ctaSearch: 'すぐ検索',
+                    heroKicker: 'どこからでも',
+                    heroTitle: 'すべては<span class="text-primary">つながる</span>',
+                    heroSubtitle: 'ひとつの好奇心を、どこまでも。',
+                    ctaExplore: '探索する',
                     placeholder: '無限の知識を探索…',
                     footerCopy: `© ${new Date().getFullYear()} NODUS. 知のつながりを探索する。`,
                     footerGraph: 'グラフ',
@@ -726,7 +705,6 @@
             heroTitle.innerHTML = langCopy.heroTitle;
             heroSubtitle.textContent = langCopy.heroSubtitle;
             ctaExplore.textContent = langCopy.ctaExplore;
-            ctaSearch.textContent = langCopy.ctaSearch;
             searchInput.placeholder = langCopy.placeholder;
             if (footerCopy) footerCopy.textContent = langCopy.footerCopy;
             if (footerGraphLink) footerGraphLink.textContent = langCopy.footerGraph;
@@ -778,8 +756,10 @@
         let mouse = { x: null, y: null, radius: 150 };
 
         window.addEventListener('mousemove', function (event) {
-            mouse.x = event.x;
-            mouse.y = event.y;
+            // 用相對 canvas 的座標，修正 body `m-4`（16px）邊距造成的排斥偏移。
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = event.clientX - rect.left;
+            mouse.y = event.clientY - rect.top;
         });
 
         window.addEventListener('mouseout', function () {
@@ -788,8 +768,15 @@
         });
 
         function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+            // 以 canvas 實際版面尺寸（CSS px）為準，並依 devicePixelRatio 放大繪圖緩衝，
+            // 讓高 DPI 螢幕的粒子與連線銳利；繪圖座標仍用 CSS px。
+            const rect = canvas.getBoundingClientRect();
+            width = rect.width;
+            height = rect.height;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
         class Particle {
@@ -860,7 +847,7 @@
                 for (let b = a; b < particles.length; b++) {
                     let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
                         + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                    if (distance < (width / 7) * (height / 7)) {
                         let opacityValue = 1 - (distance / 20000);
                         ctx.strokeStyle = `rgba(196, 198, 206, ${opacityValue * 0.15})`;
                         ctx.lineWidth = 0.5;
@@ -873,19 +860,60 @@
             }
         }
 
-        function animate() {
+        function drawFrame() {
             ctx.clearRect(0, 0, width, height);
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].draw();
             }
             connect();
-            requestAnimationFrame(animate);
         }
 
-        window.addEventListener('resize', init);
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let rafId = null;
+
+        function animate() {
+            drawFrame();
+            rafId = requestAnimationFrame(animate);
+        }
+
+        function startAnimation() {
+            if (rafId != null) return;
+            if (reduceMotion.matches) {
+                drawFrame();   // 尊重 reduced-motion：靜態繪一次，不啟動迴圈
+                return;
+            }
+            animate();
+        }
+
+        function stopAnimation() {
+            if (rafId != null) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        }
+
+        // 分頁隱藏時暫停動畫，省電省效能（手機友善）。
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
+        });
+
+        // reduced-motion 偏好切換時即時反應。
+        reduceMotion.addEventListener('change', () => {
+            stopAnimation();
+            startAnimation();
+        });
+
+        window.addEventListener('resize', () => {
+            init();
+            if (reduceMotion.matches && rafId == null) drawFrame();  // 靜態模式下重繪
+        });
         init();
-        animate();
+        startAnimation();
     </script>
 </body>
 

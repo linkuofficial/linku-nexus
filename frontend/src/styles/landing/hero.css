@@ -1,0 +1,17 @@
+/* Hero text — single-line headline tuned to sit over the deep-field starfield. */
+
+.hero-title {
+    /* 字體/字重/字級的單一來源（取代原本 h1 上重複的 font-display-* utilities）。
+       40px → 64px：短標題在桌面寬度一行成立；行動裝置才平衡換行。 */
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 6.5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;          /* 萬一在窄螢幕換行，各行長度也均衡 */
+}
+
+.hero-subtitle {
+    text-wrap: pretty;           /* 避免末行孤字 */
+    line-height: 1.55;
+}

@@ -6,6 +6,7 @@
    global tokens (public/nodus-theme.css, src/index-tailwind.css) load before this.
    ════════════════════════════════════════════════════════════════════════ */
 @import "./landing/_base.css";
+@import "./landing/hero.css";
 @import "./landing/hairline.css";
 @import "./landing/ruler.css";
 @import "./landing/search.css";

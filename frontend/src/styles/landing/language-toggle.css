@@ -31,6 +31,8 @@
 }
 
 #ctaExplore {
+    letter-spacing: 0.02em;
+    border-radius: var(--nodus-radius-control);
     background: rgba(240, 192, 80, 0.9) !important;
     color: #1a1208 !important;
     border-color: transparent !important;
@@ -41,20 +43,8 @@
     background: rgba(240, 192, 80, 1) !important;
 }
 
-#ctaSearch {
-    background: transparent !important;
-    border: 1px solid rgba(240, 192, 80, 0.32) !important;
-    color: rgba(212, 228, 250, 0.65) !important;
-}
-
-#ctaSearch:hover {
-    border-color: rgba(240, 192, 80, 0.55) !important;
-    color: rgba(212, 228, 250, 0.9) !important;
-    background: rgba(240, 192, 80, 0.06) !important;
-}
-
 #nodeCount {
-    color: rgba(212, 228, 250, 0.48) !important;
+    color: rgba(212, 228, 250, 0.6) !important;
 }
 
 .footer-nav {
@@ -96,6 +86,11 @@
 
     .footer-nav a {
         padding: 8px 12px;
+    }
+
+    /* 手機加大語言鍵的觸控區（垂直 padding），維持 ≥40px 點擊高度 */
+    .lang-btn {
+        padding: 10px 9px;
     }
 }
 

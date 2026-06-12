@@ -6,9 +6,17 @@ test("index page loads", async ({ page }) => {
 });
 
 test("app page loads and shows graph container", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
     await page.goto("/app.html");
     await expect(page).toHaveTitle(/Nodus/);
     await expect(page.locator("#canvas")).toBeVisible();
+    // canvas engine must come up with a clean console
+    await expect.poll(async () =>
+        page.evaluate(() => !!(window as any).__nodusApp?.ready())
+    ).toBeTruthy();
+    expect(errors, `runtime errors during app load:\n${errors.join("\n")}`).toHaveLength(0);
 });
 
 test("onboarding can advance and close", async ({ page }) => {

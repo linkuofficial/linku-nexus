@@ -23,7 +23,7 @@ export default {
     unlocks: '\u2193 \u89e3\u653e',
     allConnections: '\u3059\u3079\u3066\u306e\u63a5\u7d9a',
     noneFoundational: '\u306a\u3057 \u2014 \u57fa\u790e',
-    noneDetected: '\u691c\u51fa\u306a\u3057',
+    noneDetected: '\u307e\u3060\u89e3\u653e\u306a\u3057',
     pending: '\u4fdd\u7559',
     era: '\u6642\u4ee3',
     present: '\u73fe\u4ee3',

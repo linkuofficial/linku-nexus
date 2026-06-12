@@ -23,7 +23,7 @@ export default {
     unlocks: '\u2193 Unlocks',
     allConnections: 'All Connections',
     noneFoundational: 'None \u2014 foundational',
-    noneDetected: 'None detected',
+    noneDetected: 'Nothing unlocked yet',
     pending: 'pending',
     era: 'Era',
     present: 'present',

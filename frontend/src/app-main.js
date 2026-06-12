@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { createCanvasRenderer, ensureVis } from './engine/canvas-renderer.js';
+import { createLayoutSimulation, TYPE_SIZE } from './engine/layout.js';
 
 // ===== I18N =====
 // All translation data lives in ./i18n.js (which re-exports ./i18n/{lang}.js).
@@ -218,7 +219,6 @@ function hideLoadingState() {
 // ===== CONSTANTS =====
 const DC = window.NodusTokens?.DOMAIN_COLORS || { MAT: '#5b9bd5', PHY: '#c97a5b', CHE: '#c9c05b', BIO: '#5bc97a', MED: '#5bc9b8', ENG: '#9b7bc9', TEC: '#c95b9b', SOC: '#c9a05a', HUM: '#7ba5c9', PHI: '#9bc95b', ART: '#c95b5b', HIS: '#a07850' };
 const RC = window.NodusTokens?.RELATION_COLORS || { logical: '#5b9bd5', historical: '#c9a05a', applied: '#5bc97a', conceptual: '#9b7bc9', causal: '#c95b5b' };
-const TYPE_SIZE = { field: 16, concept: 6, person: 9, event: 11 };
 
 let allNodes = [], allEdges = [], nodeMap = {}, sim, zoomBehavior;
 let renderer = null;          // canvas scene painter (engine/canvas-renderer.js)
@@ -861,23 +861,9 @@ function buildGraph() {
             }
         });
 
-    sim = d3.forceSimulation(allNodes)
-        .force('link', d3.forceLink(allEdges).id(d => d.id).distance(d => {
-            const s = nodeMap[d.source.id || d.source], t = nodeMap[d.target.id || d.target];
-            if (s && t && s.type === 'field' && t.type === 'field') return 180;
-            if ((s && s.type === 'field') || (t && t.type === 'field')) return 100;
-            return 60;
-        }).strength(d => {
-            const s = nodeMap[d.source.id || d.source], t = nodeMap[d.target.id || d.target];
-            if (s && t && s.type === 'field' && t.type === 'field') return 0.3;
-            return 0.15;
-        }))
-        .force('charge', d3.forceManyBody().strength(d => d.type === 'field' ? -600 : -120).theta(0.9))
-        .force('center', d3.forceCenter(W / 2, H / 2))
-        .force('collision', d3.forceCollide(d => nr(d) + 4))
-        .alphaDecay(0.03)
-        .alphaMin(0.008)
-        .velocityDecay(0.4);
+    // Same canonical force config the build-time bake used (engine/layout.js),
+    // so a re-heat on drag settles toward the very layout that was baked.
+    sim = createLayoutSimulation(allNodes, allEdges, W, H);
 
     canvasSel.call(zoomBehavior);
 
@@ -936,10 +922,19 @@ function buildGraph() {
         simHint.classList.add('visible');
     }
 
-    // Warm-up: run 30 ticks without rendering to pre-settle node positions,
-    // then paint the settled frame and start the render loop.
+    // Positions are pre-baked into the topology at build time (engine/layout.js
+    // + vite copyDataPlugin), so the constellation opens already settled with no
+    // warm-up CPU and an identical layout on every device / reload. The sim stays
+    // parked (drag re-heats it locally). Dev fallback: if a node lacks baked x/y
+    // we run the old live warm-up.
+    const baked = allNodes.length > 0 && allNodes.every(n => Number.isFinite(n.x) && Number.isFinite(n.y));
     sim.stop();
-    for (let i = 0; i < 30; i++) sim.tick();
+    if (baked) {
+        if (simHint) simHint.classList.remove('visible');
+    } else {
+        for (let i = 0; i < 30; i++) sim.tick();
+    }
+    fitView();
     renderer.notify();
 
     sim.on('tick', () => {
@@ -964,8 +959,8 @@ function buildGraph() {
         setTimeout(() => simHint.classList.remove('visible', 'fading'), 520);
     });
 
-    // Resume simulation after warm-up (tick handler now bound)
-    sim.restart();
+    // Resume the live warm-up only when positions were NOT pre-baked.
+    if (!baked) sim.restart();
 
     // Dismiss welcome overlay on first graph interaction
     const _welcomeEl = document.getElementById('welcome-overlay');
@@ -1093,6 +1088,23 @@ function estimateAdaptiveScale(node, availableWidth, availableHeight) {
     const targetRadiusPx = Math.min(availableWidth * 0.42, availableHeight * 0.44);
     const nextScale = targetRadiusPx / focusRadius;
     return Math.max(0.95, Math.min(3.6, nextScale));
+}
+
+// Frame the whole constellation on first paint: centre the layout's centroid
+// in the viewport at k=1 (the baked spread is identical to the old runtime
+// spread, so this reproduces the previous opening view without any warm-up).
+function fitView() {
+    if (!canvasSel || !zoomBehavior || !allNodes.length) return;
+    let sx = 0, sy = 0, n = 0;
+    for (const node of allNodes) {
+        if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) continue;
+        sx += node.x; sy += node.y; n++;
+    }
+    if (!n) return;
+    const cx = sx / n, cy = sy / n;
+    const W = window.innerWidth, H = window.innerHeight;
+    const transform = d3.zoomIdentity.translate(W / 2 - cx, H / 2 - cy);
+    canvasSel.call(zoomBehavior.transform, transform);
 }
 
 function centerViewOnNode(node, duration = 500) {

@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { pathToFileURL } from 'url';
 import { copyFileSync, mkdirSync, readdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 
 function copyDataPlugin() {
     return {
         name: 'copy-data',
-        buildStart() {
+        async buildStart() {
             const srcDir = resolve(__dirname, 'data');
             const destDir = resolve(__dirname, 'frontend/public/data');
             mkdirSync(destDir, { recursive: true });
@@ -27,6 +28,25 @@ function copyDataPlugin() {
                 }
                 return n;
             });
+            // Pre-bake the force layout: run the canonical simulation (shared with
+            // the runtime via engine/layout.js) to rest and stamp x/y onto every
+            // node. The page then opens on the settled constellation with zero
+            // warm-up CPU and an identical layout on every device / reload.
+            try {
+                const layoutUrl = pathToFileURL(resolve(__dirname, 'frontend/src/engine/layout.js')).href;
+                const { bakeLayout } = await import(layoutUrl);
+                const positions = bakeLayout(nodes);
+                const posById = new Map(positions.map((p: any) => [p.id, p]));
+                for (const n of slimNodes) {
+                    const p = posById.get(n.id);
+                    if (p) { n.x = p.x; n.y = p.y; }
+                }
+            } catch (err) {
+                // Non-fatal: without baked positions the runtime falls back to a
+                // live warm-up. Surface it so a broken bake doesn't pass silently.
+                this.warn?.(`layout bake skipped: ${(err as Error).message}`);
+            }
+
             const slim = Array.isArray(raw) ? slimNodes : { ...raw, nodes: slimNodes };
             writeFileSync(resolve(destDir, 'all_nodes.json'), JSON.stringify(slim));
             writeFileSync(resolve(destDir, 'descriptions.json'), JSON.stringify(descriptions));

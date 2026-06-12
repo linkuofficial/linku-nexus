@@ -5,10 +5,34 @@
 > 剩餘：步驟 7（explorer 套用同一 renderer）——explorer 目前仍為 SVG，正常運作。
 >
 > 實作落點：`src/engine/star-sprites.js`（離屏星體 sprite）+
-> `src/engine/canvas-renderer.js`（場景繪製器）+ `app-main.js`（vis 旗標 + 指標互動）。
+> `src/engine/canvas-renderer.js`（場景繪製器，已含 Deep Field：層級/焦點調暗/
+> 漸層曲線/大氣層/標籤防碰撞/超級 hub 克制）+ `app-main.js`（vis 旗標 + 指標互動）
+> + `src/engine/layout.js`（共用力導向，build 時預烘焙座標）+ `theme.js`（design tokens）。
 > 實戰教訓：(1) 每幀對數十條曲線開 `shadowBlur` 會把 Chrome 光柵壓到 2fps——
 > 光暈一律用「寬+窄雙筆畫」疊出；(2) 加色合成在遠距縮放會把重疊星體疊爆成白團——
 > 需要隨 k 縮小的曝光控制；(3) 首幀必須同步繪製，rAF 在隱藏分頁不觸發。
+>
+> ## 步驟 7（explorer 移植）執行藍圖 — 2026-06-12 盤點
+>
+> explorer 與 app 的差異在「漸進展開」：`rebuildVisuals()`（explorer-main.js:1221）
+> 對 **可見子集** `visibleNodes`/`visibleEdges` 做 d3 data-join（enter/merge），
+> `tick()`（:1180）更新位置。移植步驟：
+> 1. **資料集介面**：canvas-renderer 目前在建立時鎖定 `nodes`/`edges` 參考。explorer
+>    每次展開會 `visibleNodes = Array.from(...)`（換新陣列）。需給 renderer 加
+>    `setData(nodes, edges)`，或改 explorer 就地 mutate 同一陣列。前者較乾淨。
+> 2. **vis 旗標接線**：把 explorer 的 selected/highlight/dimmed/prereq 狀態從 CSS class
+>    改成 node.vis/edge.vis（與 app 同一套語意），刪除 SVG defs/node-creation/tick DOM 寫入。
+> 3. **explorer 專屬視覺**需在 canvas 補：expand ring（hover 顯示鄰居數）、neighbor badge、
+>    node-entrance 動畫（新展開節點淡入放大）；DOM overlay（context menu、link tooltip、
+>    recommendation panel）改讀 renderer 的螢幕座標即可，不需重畫。
+> 4. **E2E 重寫**：explorer 的 `startExploration`/`g` hook 與 SVG 斷言（`g.node`、`circle.core`、
+>    focus-glow）改成 app 那套引擎狀態 hook（仿 `window.__nodusApp`）+ 像素取樣。
+> 5. **共用 layout**：explorer 也可用 `layout.js`，但它是子集動態模擬，預烘焙意義不大；
+>    保留即時模擬即可。
+> 6. 順手清「三套粒子實作」最後一份（explorer 的 `initParticles`）。
+>
+> 風險：explorer 線上正常運作，半成品不可合進自動部署的 master——須在分支完成並
+> 經人工視覺驗收（如 app 港口）後才合併。規模與 app 港口相當（非小修）。
 >
 > 以下原始藍圖保留作歷史脈絡與 explorer 移植時的參考。
 

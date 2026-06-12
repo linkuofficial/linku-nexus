@@ -1,3 +1,6 @@
+import * as d3 from 'd3';
+import { hexA, curvedEdgePath } from './engine/geometry.js';
+
 // ===== I18N =====
 // All translation data lives in ./i18n.js (which re-exports ./i18n/{lang}.js).
 import { I18N, isValidLang, getLang, TAG_LABELS, TAG_TOKEN_ZH, TAG_TOKEN_JA } from './i18n.js';
@@ -233,9 +236,6 @@ let enDescriptionMap = {}; // English descriptions loaded from /api/graph/descri
 let _searchIndex = null; // Pre-built lowercase index for fast search
 let currentPanelNodeId = null;
 let relatedLabelIds = new Set();
-const EDGE_CURVE_DISTANCE_FACTOR = 0.18;
-const EDGE_CURVE_MIN_OFFSET = 10;
-const EDGE_CURVE_MAX_OFFSET = 42;
 const TOP_CHROME_EXPAND_DELAY = 90;
 const TOP_CHROME_COLLAPSE_DELAY = 260;
 const NAV_HISTORY_STORAGE_KEY = 'nodus-nav-history-v1';
@@ -463,17 +463,13 @@ async function init() {
         }
     }
 
-    // Load graph data from API (fallback to static JSON)
-    // Load descriptions in parallel (non-blocking)
+    // Load the graph topology first so the constellation can render as soon as
+    // possible. The heavier English descriptions are split into their own payload
+    // and streamed in afterwards (see the enrichment call at the end of init).
     let data;
     try {
         setLoadingState(t('loadingGraph'));
-        const [graphResult, descResult] = await Promise.all([
-            loadGraphData(),
-            window.NodusApi.fetchGraphDescriptions(),
-        ]);
-        data = graphResult;
-        enDescriptionMap = descResult;
+        data = await loadGraphData();
     } catch (e) {
         setLoadingState('Unable to load graph data. Please retry.', true, true);
         return;
@@ -538,6 +534,15 @@ async function init() {
     setupLPMode();
     applyI18n();
     setupGuides();
+
+    // Stream English descriptions in after the graph is interactive. Until they
+    // land, label/id/tag/domain search all work; once they arrive we re-index so
+    // full-text search lights up and refresh any panel that's already open.
+    window.NodusApi.fetchGraphDescriptions().then((map) => {
+        enDescriptionMap = map || {};
+        rebuildSearchIndex();
+        if (currentPanelNodeId && nodeMap[currentPanelNodeId]) openPanel(nodeMap[currentPanelNodeId]);
+    }).catch(() => { /* descriptions are non-critical */ });
 }
 
 function setupTopChrome() {
@@ -723,11 +728,7 @@ function nc(n) { return DC[n.domain[0]] || '#888' }
 function nr(n) { return TYPE_SIZE[n.type] || 6 }
 
 // ── Star rendering (visual only — fully decoupled from physics) ──────────────
-// hex "#rrggbb" + alpha → "rgba(...)". Used to author the layered star gradients.
-function hexA(hex, a) {
-    const n = parseInt(String(hex).slice(1), 16);
-    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
-}
+// hexA / edge-curve geometry now live in ./engine/geometry.js (shared with explorer).
 
 // Per-node star metadata: tier (three magnitudes) + bloom radii for
 // core/glow/halo/corona, brightness, and stable twinkle timing.
@@ -767,39 +768,6 @@ function buildStarMeta() {
     });
 }
 function sm(n) { return starMeta[n.id] || { core: nr(n) * 0.3, glow: nr(n), halo: nr(n) * 2, corona: nr(n) * 4, glowAlpha: 0.6, baseOp: 0.8, twDur: '5', twDelay: '0' }; }
-function edgeCurveDirection(edge) {
-    const s = String(edge.source.id || edge.source || '');
-    const t = String(edge.target.id || edge.target || '');
-    let hash = 0;
-    const key = s < t ? s + '|' + t : t + '|' + s;
-    for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
-    return hash % 2 === 0 ? 1 : -1;
-}
-
-function curvedEdgePath(edge) {
-    const sx = edge.source.x ?? 0;
-    const sy = edge.source.y ?? 0;
-    const tx = edge.target.x ?? 0;
-    const ty = edge.target.y ?? 0;
-    // Cache: reuse last path string if positions haven't moved significantly
-    if (edge._cpCache &&
-        Math.abs(sx - edge._cpSx) < 0.5 && Math.abs(sy - edge._cpSy) < 0.5 &&
-        Math.abs(tx - edge._cpTx) < 0.5 && Math.abs(ty - edge._cpTy) < 0.5) {
-        return edge._cpCache;
-    }
-    const dx = tx - sx;
-    const dy = ty - sy;
-    const dist = Math.hypot(dx, dy) || 1;
-    const nx = -dy / dist;
-    const ny = dx / dist;
-    const baseOffset = Math.min(EDGE_CURVE_MAX_OFFSET, Math.max(EDGE_CURVE_MIN_OFFSET, dist * EDGE_CURVE_DISTANCE_FACTOR));
-    const dir = edgeCurveDirection(edge);
-    const cx = (sx + tx) * 0.5 + nx * baseOffset * dir;
-    const cy = (sy + ty) * 0.5 + ny * baseOffset * dir;
-    const path = `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
-    edge._cpCache = path; edge._cpSx = sx; edge._cpSy = sy; edge._cpTx = tx; edge._cpTy = ty;
-    return path;
-}
 
 function refreshFocusCurves() {
     if (!focusCurveG || !linkNodeRefs.length) return;

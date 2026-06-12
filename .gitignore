@@ -35,3 +35,6 @@ playwright-report/
 # Deploy artifacts
 docs/deploy/caddy/
 docs/deploy/.env.production
+
+# Local preview tooling
+.claude/launch.json

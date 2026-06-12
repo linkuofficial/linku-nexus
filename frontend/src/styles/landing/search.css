@@ -1,3 +1,12 @@
+/* Search bar shell — borderless, low-opacity fill instead of a gray stroke.
+   The focus ring (.search-glow:focus-within in _base.css) supplies the only
+   visible border, and only while focused. */
+.search-shell {
+    border-color: transparent;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: var(--nodus-radius-control);
+}
+
 /* Search results dropdown */
 .search-results {
     position: absolute;
@@ -7,6 +16,7 @@
     max-height: 320px;
     overflow-y: auto;
     z-index: 50;
+    border-radius: var(--nodus-radius-panel);
     scrollbar-width: thin;
     scrollbar-color: rgba(196, 198, 206, 0.2) transparent;
 }

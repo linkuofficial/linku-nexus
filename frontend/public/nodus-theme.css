@@ -3,6 +3,8 @@
     --nodus-radius-sm: 6px;
     --nodus-radius-md: 12px;
     --nodus-radius-lg: 20px;
+    --nodus-radius-control: 999px;   /* 互動控件統一圓角（膠囊）：搜尋框 / 按鈕 / 標籤 */
+    --nodus-radius-panel: 16px;      /* 浮層面板統一圓角：下拉結果 / tooltip */
     --nodus-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.38);
     --nodus-shadow-strong: 0 24px 56px rgba(0, 0, 0, 0.58);
     --nodus-ease-ui: cubic-bezier(0.16, 1, 0.3, 1);

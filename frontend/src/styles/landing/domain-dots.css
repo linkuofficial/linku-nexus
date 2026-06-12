@@ -6,14 +6,26 @@
     display: inline-block;
 }
 
+/* NOTE: 不在此寫死 `display`。顯隱由 HTML 的 Tailwind utilities
+   (`inline-flex` / `hidden sm:inline-flex` / `hidden md:inline-flex`) 控制；
+   未分層的 `.pill-btn` 若設 display 會蓋過 @layer utilities 的 `.hidden`，
+   讓手機版的 RWD 精簡失效。內部對齊改由 utilities 的 inline-flex 提供。 */
 .pill-btn {
-    display: inline-flex;
     align-items: center;
     gap: 8px;
+    border-color: transparent;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--nodus-radius-control);
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+.pill-btn:hover {
+    background-color: rgba(255, 255, 255, 0.09);
 }
 
 .pill-label {
     line-height: 1;
+    letter-spacing: 0.01em;
 }
 
 .pill-domain {

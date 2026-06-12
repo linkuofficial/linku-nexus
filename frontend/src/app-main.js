@@ -790,22 +790,29 @@ function findNodeAtScreen(px, py) {
     return (dx * dx + dy * dy) <= hitR * hitR ? candidate : null;
 }
 
-// Renderer label hook — same semantic-zoom rules the SVG version applied via
-// text opacity + the .related-node / .dimmed CSS classes.
+// Renderer label hook — semantic-zoom rules plus the Deep Field focus story:
+// while a node is selected, only its constellation gets to speak (every
+// unrelated label yields, fields included), so the lit cluster reads clean.
 function labelInfo(n, hovered) {
     const v = n.vis || {};
     if (v.dimmed) return null;
+    const focusActive = !!currentPanelNodeId;
     let alpha = 0;
-    if (shouldShowLabel(n)) alpha = 0.88;
-    if (v.related) alpha = 0.92;
+    if (focusActive) {
+        if (v.related) alpha = 0.92;
+        else if (lpMode && (learnedSet.has(n.id) || isAvailable(n.id))) alpha = 0.6;
+    } else if (shouldShowLabel(n)) {
+        alpha = n.type === 'field' ? 0.85 : 0.78;
+    }
     if (hovered) alpha = Math.max(alpha, 0.9);
     if (alpha <= 0) return null;
     const m = sm(n);
     return {
         text: nodeLabel(n),
         dy: Math.max(m.halo * 0.5, nr(n) + 12),
-        size: n.type === 'field' ? 11 : 10,
+        size: n.type === 'field' ? 12 : 10,
         alpha,
+        field: n.type === 'field',
     };
 }
 

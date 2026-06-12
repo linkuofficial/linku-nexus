@@ -71,8 +71,13 @@ test("app.html chrome computed styles", { tag: "@visual" }, async ({ page }) => 
     await page.goto("/app.html");
     await page.waitForLoadState("networkidle");
     await freezeMotion(page);
-    // Open the detail drawer so #p-* styles resolve.
-    await page.locator("g.node circle.hit").first().click({ force: true }).catch(() => {});
+    // Open the detail drawer so #p-* styles resolve. The graph is a canvas
+    // (no per-node DOM), so select through the engine hook — nodeIds()[0] is
+    // the same node the old "first g.node" click resolved to.
+    await page.evaluate(() => {
+        const app = (window as any).__nodusApp;
+        if (app?.selectNode) app.selectNode(app.nodeIds()[0]);
+    });
     await page.waitForTimeout(400);
     const sels = [
         "body", "#bgCanvas", "#canvas", "#hdr", "#hdr h1", "#hdr p",

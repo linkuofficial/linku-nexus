@@ -1,7 +1,16 @@
 # Nodus 渲染升級計畫（P2：SVG → Canvas）
 
-> 狀態：**暫緩（deliberately deferred）**。本文件是可執行的遷移藍圖。
-> P0–P1 的架構優化已完成並驗證（見分支 `feat/arch-render-upgrade`）。
+> 狀態（2026-06-12 更新）：**app 頁已完成 Canvas 化**（分支 `feat/p2-canvas-renderer`，
+> 步驟 1–6 全數執行完畢，11 E2E + 3 視覺 oracle 通過，真實 GPU ~100fps）。
+> 剩餘：步驟 7（explorer 套用同一 renderer）——explorer 目前仍為 SVG，正常運作。
+>
+> 實作落點：`src/engine/star-sprites.js`（離屏星體 sprite）+
+> `src/engine/canvas-renderer.js`（場景繪製器）+ `app-main.js`（vis 旗標 + 指標互動）。
+> 實戰教訓：(1) 每幀對數十條曲線開 `shadowBlur` 會把 Chrome 光柵壓到 2fps——
+> 光暈一律用「寬+窄雙筆畫」疊出；(2) 加色合成在遠距縮放會把重疊星體疊爆成白團——
+> 需要隨 k 縮小的曝光控制；(3) 首幀必須同步繪製，rAF 在隱藏分頁不觸發。
+>
+> 以下原始藍圖保留作歷史脈絡與 explorer 移植時的參考。
 
 ## 為什麼暫緩
 

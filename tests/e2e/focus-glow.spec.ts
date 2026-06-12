@@ -40,15 +40,52 @@ async function assertGlow(page) {
 }
 
 test("app: clicking a node lights up its connections", async ({ page }) => {
+    // Canvas renderer: click the highest-degree on-screen node with a REAL
+    // mouse click, then assert (a) the engine lit its focus curves + ring and
+    // (b) actual pixels around the node got painted bright — the glow exists.
     await page.addInitScript(() => localStorage.setItem("nodus-app-onboard-seen-v1", "1"));
     await page.goto("/app.html");
-    await page.waitForLoadState("networkidle");
-    await expect(page.locator("g.node").first()).toBeVisible();
+    await expect.poll(async () =>
+        page.evaluate(() => !!(window as any).__nodusApp?.ready())
+    ).toBeTruthy();
     await page.waitForTimeout(800);
-    const deg = await page.evaluate(CLICK_HUB);
-    expect(deg).toBeGreaterThan(0);
+
+    const target = await page.evaluate(() => {
+        const app = (window as any).__nodusApp;
+        let best: any = null, bestDeg = -1;
+        for (const id of app.nodeIds()) {
+            const p = app.screenPos(id);
+            if (!p || p.x < 80 || p.x > innerWidth - 80 || p.y < 140 || p.y > innerHeight - 80) continue;
+            const deg = app.degree(id);
+            if (deg > bestDeg) { bestDeg = deg; best = { id, ...p }; }
+        }
+        return { ...best, deg: bestDeg };
+    });
+    expect(target.deg).toBeGreaterThan(0);
+
+    await page.mouse.click(target.x, target.y);
     await page.waitForTimeout(600);
-    await assertGlow(page);
+
+    const debug = await page.evaluate(() => (window as any).__nodusApp.debug());
+    expect(debug.activeEdges, "focus-curve edges should light up").toBeGreaterThan(0);
+    expect(debug.hasRing, "selected node should get a focus-ring").toBeTruthy();
+
+    // Pixel proof: the selected star's neighbourhood must be visibly lit.
+    const litPixels = await page.evaluate((id) => {
+        const app = (window as any).__nodusApp;
+        const p = app.screenPos(id); // the click re-centers the view — re-read
+        const c = document.getElementById("canvas") as HTMLCanvasElement;
+        const ctx = c.getContext("2d")!;
+        const dpr = c.width / innerWidth;
+        const size = Math.round(80 * dpr);
+        const img = ctx.getImageData(Math.round(p.x * dpr - size / 2), Math.round(p.y * dpr - size / 2), size, size).data;
+        let lit = 0;
+        for (let i = 0; i < img.length; i += 4) {
+            if (img[i] + img[i + 1] + img[i + 2] > 90) lit++;
+        }
+        return lit;
+    }, target.id);
+    expect(litPixels, "pixels around the selected star should be lit").toBeGreaterThan(100);
 });
 
 test("explorer: clicking a node lights up its connections", async ({ page }) => {

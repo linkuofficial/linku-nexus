@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { hexA, curvedEdgePath } from './engine/geometry.js';
+import { createCanvasRenderer, ensureVis } from './engine/canvas-renderer.js';
 
 // ===== I18N =====
 // All translation data lives in ./i18n.js (which re-exports ./i18n/{lang}.js).
@@ -103,8 +103,8 @@ async function setLang(lang) {
     }
     rebuildSearchIndex();
     applyI18n();
-    // Update graph node labels
-    if (nodeEls) nodeEls.select('text').text(d => nodeLabel(d));
+    // Node labels are read live by the renderer's label hook — just repaint.
+    if (renderer) renderer.notify();
 }
 
 function applyI18n() {
@@ -220,9 +220,10 @@ const DC = window.NodusTokens?.DOMAIN_COLORS || { MAT: '#5b9bd5', PHY: '#c97a5b'
 const RC = window.NodusTokens?.RELATION_COLORS || { logical: '#5b9bd5', historical: '#c9a05a', applied: '#5bc97a', conceptual: '#9b7bc9', causal: '#c95b5b' };
 const TYPE_SIZE = { field: 16, concept: 6, person: 9, event: 11 };
 
-let allNodes = [], allEdges = [], nodeMap = {}, sim, nodeEls, linkEls, g, svgEl, zoomBehavior;
-let focusCurveEls, focusCurveG;
-let linkNodeRefs = [];
+let allNodes = [], allEdges = [], nodeMap = {}, sim, zoomBehavior;
+let renderer = null;          // canvas scene painter (engine/canvas-renderer.js)
+let canvasSel = null;         // d3 selection of the <canvas> (zoom/drag/transitions)
+let viewTransform = d3.zoomIdentity;
 let activeFilter = null;
 let lpMode = false;
 let learnedSet = new Set();
@@ -710,17 +711,17 @@ function buildFilters() {
 }
 
 function applyVisibility() {
+    if (!renderer) return;
     if (lpMode) { applyLPVisibility(); return; }
     if (!activeFilter) {
-        nodeEls.classed('dimmed', false);
-        linkEls.classed('dimmed-link', false);
-        refreshFocusCurves();
-        return;
+        for (const n of allNodes) ensureVis(n).dimmed = false;
+        for (const e of allEdges) ensureVis(e).dimmed = false;
+    } else {
+        const visible = new Set(allNodes.filter(n => n.domain.includes(activeFilter)).map(n => n.id));
+        for (const n of allNodes) ensureVis(n).dimmed = !visible.has(n.id);
+        for (const e of allEdges) ensureVis(e).dimmed = !(visible.has(e.source.id) && visible.has(e.target.id));
     }
-    const visible = new Set(allNodes.filter(n => n.domain.includes(activeFilter)).map(n => n.id));
-    nodeEls.classed('dimmed', d => !visible.has(d.id));
-    linkEls.classed('dimmed-link', d => !(visible.has(d.source.id) && visible.has(d.target.id)));
-    refreshFocusCurves();
+    renderer.notify();
 }
 
 // ===== GRAPH =====
@@ -769,105 +770,89 @@ function buildStarMeta() {
 }
 function sm(n) { return starMeta[n.id] || { core: nr(n) * 0.3, glow: nr(n), halo: nr(n) * 2, corona: nr(n) * 4, glowAlpha: 0.6, baseOp: 0.8, twDur: '5', twDelay: '0' }; }
 
-function refreshFocusCurves() {
-    if (!focusCurveG || !linkNodeRefs.length) return;
-    // Collect only edges that are highlighted or on prereq path
-    const activeEdges = [];
-    for (let i = 0; i < linkNodeRefs.length; i++) {
-        const el = linkNodeRefs[i];
-        if (el && (el.classList.contains('highlight') || el.classList.contains('prereq-path'))) {
-            activeEdges.push({ edge: allEdges[i], isPrereq: el.classList.contains('prereq-path') });
-        }
-    }
-    // Remove old curves and create fresh ones for active edges only.
-    // Each active edge = a coloured backbone path + a flowing PHOTON overlay,
-    // so the lit constellation reads as energy running between its stars.
-    focusCurveG.selectAll('*').remove();
-    if (activeEdges.length === 0) { focusCurveEls = null; return; }
-    // Backbone — keeps the semantic relation colour (shared.css).
-    focusCurveG.selectAll('path.focus-curve').data(activeEdges.map(a => a.edge)).enter().append('path')
-        .attr('class', (d, i) => {
-            const a = activeEdges[i];
-            let cls = 'link focus-curve ' + d.relation_type + ' active';
-            cls += a.isPrereq ? ' prereq-path' : ' highlight';
-            return cls;
-        })
-        .attr('marker-end', (d, i) => activeEdges[i].isPrereq ? 'url(#arrow)' : null)
-        .attr('d', d => curvedEdgePath(d));
-    // Photon — a single long luminous dash gliding the edge (CSS-animated).
-    focusCurveG.selectAll('path.photon').data(activeEdges.map(a => a.edge)).enter().append('path')
-        .attr('class', (d, i) => 'photon' + (activeEdges[i].isPrereq ? ' photon-gold' : ''))
-        .style('stroke', (d, i) => activeEdges[i].isPrereq ? '#f7d27d' : (RC[d.relation_type] || '#cfe0f5'))
-        .attr('d', d => curvedEdgePath(d));
-    // Both path sets carry the edge datum → the existing tick re-paths all of
-    // them via `focusCurveEls.attr('d', …)` with no extra per-tick work added.
-    focusCurveEls = focusCurveG.selectAll('path');
+// Focus curves (lit constellation backbone + flowing photon) are now derived
+// every frame by the canvas renderer from edge.vis.highlight / .prereqPath —
+// there is no DOM to rebuild, so the old refreshFocusCurves() plumbing is gone.
+
+// Hit-test in screen space: stars render at a constant apparent size, so the
+// invisible touch target (min 22px radius = 44px target, same as the old SVG
+// circle.hit) is constant in screen px too. sim.find() does the quadtree work.
+function findNodeAtScreen(px, py) {
+    if (!sim) return null;
+    const t = viewTransform;
+    const wx = (px - t.x) / t.k;
+    const wy = (py - t.y) / t.k;
+    const candidate = sim.find(wx, wy, 40 / t.k);
+    if (!candidate) return null;
+    const dx = candidate.x * t.k + t.x - px;
+    const dy = candidate.y * t.k + t.y - py;
+    const hitR = Math.max(22, nr(candidate) + 10);
+    return (dx * dx + dy * dy) <= hitR * hitR ? candidate : null;
+}
+
+// Renderer label hook — same semantic-zoom rules the SVG version applied via
+// text opacity + the .related-node / .dimmed CSS classes.
+function labelInfo(n, hovered) {
+    const v = n.vis || {};
+    if (v.dimmed) return null;
+    let alpha = 0;
+    if (shouldShowLabel(n)) alpha = 0.88;
+    if (v.related) alpha = 0.92;
+    if (hovered) alpha = Math.max(alpha, 0.9);
+    if (alpha <= 0) return null;
+    const m = sm(n);
+    return {
+        text: nodeLabel(n),
+        dy: Math.max(m.halo * 0.5, nr(n) + 12),
+        size: n.type === 'field' ? 11 : 10,
+        alpha,
+    };
 }
 
 function buildGraph() {
     const W = window.innerWidth, H = window.innerHeight;
-    svgEl = d3.select('#canvas').attr('width', W).attr('height', H);
-    g = svgEl.append('g');
+    const canvas = document.getElementById('canvas');
+    canvasSel = d3.select(canvas);
 
-    // Defs: gradients + glow filter + arrow marker
-    const defs = svgEl.append('defs');
-    // Radial gradients per domain color (legacy grad-XXX kept for compatibility)
-    Object.entries(DC).forEach(([key, color]) => {
-        const grad = defs.append('radialGradient').attr('id', 'grad-' + key);
-        grad.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0.9);
-        grad.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0.25);
+    // Star bloom metadata (visual only — never touches the sim) must exist
+    // before the first paint.
+    buildStarMeta();
+    for (const n of allNodes) ensureVis(n);
+    for (const e of allEdges) ensureVis(e);
+
+    renderer = createCanvasRenderer({
+        canvas,
+        nodes: allNodes,
+        edges: allEdges,
+        relationColor: (rel) => RC[rel],
+        domainColor: (n) => nc(n),
+        starMeta: (n) => sm(n),
+        label: labelInfo,
     });
-    // Layered STAR gradients per domain: core (white-hot body) → glow (tight
-    // colored bloom) → halo (mid atmosphere) → corona (faint breathing field).
-    function starStops(id, stops) {
-        const g = defs.append('radialGradient').attr('id', id).attr('cx', '50%').attr('cy', '50%').attr('r', '50%');
-        stops.forEach(([off, col, op]) => {
-            const s = g.append('stop').attr('offset', off).attr('stop-color', col);
-            if (op != null) s.attr('stop-opacity', op);
-        });
-    }
-    Object.entries(DC).forEach(([key, color]) => {
-        starStops('core-' + key, [
-            ['0%', '#ffffff', 1], ['22%', '#ffffff', 0.98], ['48%', '#ffffff', 0.78],
-            ['70%', hexA(color, 0.55)], ['88%', hexA(color, 0.22)], ['100%', hexA(color, 0)],
-        ]);
-        starStops('glow-' + key, [
-            ['0%', hexA(color, 0.92)], ['24%', hexA(color, 0.58)], ['55%', hexA(color, 0.18)], ['100%', hexA(color, 0)],
-        ]);
-        starStops('halo-' + key, [
-            ['0%', hexA(color, 0.32)], ['38%', hexA(color, 0.13)], ['78%', hexA(color, 0.035)], ['100%', hexA(color, 0)],
-        ]);
-        starStops('corona-' + key, [
-            ['0%', hexA(color, 0)], ['30%', hexA(color, 0.035)], ['65%', hexA(color, 0.012)], ['100%', hexA(color, 0)],
-        ]);
-    });
-    // Glow filter (node legacy)
-    const glow = defs.append('filter').attr('id', 'node-glow').attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
-    glow.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', '3').attr('result', 'blur');
-    const merge = glow.append('feMerge');
-    merge.append('feMergeNode').attr('in', 'blur');
-    merge.append('feMergeNode').attr('in', 'SourceGraphic');
-    // Edge glow filter — gives constellation lines their faint fluorescent halo.
-    const eglow = defs.append('filter').attr('id', 'edge-glow').attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
-    eglow.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', '1.4').attr('result', 'eb');
-    const emerge = eglow.append('feMerge');
-    emerge.append('feMergeNode').attr('in', 'eb');
-    emerge.append('feMergeNode').attr('in', 'SourceGraphic');
-    // Arrow marker
-    defs.append('marker')
-        .attr('id', 'arrow')
-        .attr('viewBox', '0 0 10 10')
-        .attr('refX', 20).attr('refY', 5)
-        .attr('markerWidth', 6).attr('markerHeight', 6)
-        .attr('orient', 'auto-start-reverse')
-        .append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z').attr('class', 'arrow-marker');
 
     let _labelRaf = 0;
-    zoomBehavior = d3.zoom().scaleExtent([0.1, 6]).on('zoom', e => {
-        g.attr('transform', e.transform);
-        currentZoom = e.transform.k;
-    });
-    svgEl.call(zoomBehavior);
+    zoomBehavior = d3.zoom().scaleExtent([0.1, 6])
+        .filter((ev) => {
+            if (ev.ctrlKey && ev.type !== 'wheel') return false;
+            if (ev.button) return false;
+            // A press on a star belongs to the node drag, not the pan.
+            if (ev.type === 'mousedown' || ev.type === 'touchstart') {
+                const [px, py] = d3.pointer(ev, canvas);
+                return !findNodeAtScreen(px, py);
+            }
+            return true;
+        })
+        .on('zoom', (e) => {
+            viewTransform = e.transform;
+            currentZoom = e.transform.k;
+            renderer.setTransform(e.transform);
+            if (!_labelRaf) {
+                _labelRaf = requestAnimationFrame(() => {
+                    updateLabelVisibility();
+                    _labelRaf = 0;
+                });
+            }
+        });
 
     sim = d3.forceSimulation(allNodes)
         .force('link', d3.forceLink(allEdges).id(d => d.id).distance(d => {
@@ -887,98 +872,54 @@ function buildGraph() {
         .alphaMin(0.008)
         .velocityDecay(0.4);
 
-    linkEls = g.append('g').attr('class', 'links').selectAll('line').data(allEdges).enter().append('line')
-        .attr('class', d => 'link ' + d.relation_type + (d.pending ? ' pending' : ''));
-    linkNodeRefs = linkEls.nodes();
+    canvasSel.call(zoomBehavior);
 
-    focusCurveG = g.append('g').attr('class', 'focus-curves');
-    focusCurveEls = null;
+    // Node drag — d3.drag with a hit-tested subject. Pointer coords are mapped
+    // through the zoom transform so dragging stays exact at every zoom level.
+    canvasSel.call(d3.drag()
+        .container(canvas)
+        .subject((ev) => {
+            const [px, py] = d3.pointer(ev.sourceEvent, canvas);
+            return findNodeAtScreen(px, py) || undefined;
+        })
+        .on('start', (ev) => {
+            if (!ev.active) sim.alphaTarget(0.3).restart();
+            ev.subject.fx = ev.subject.x;
+            ev.subject.fy = ev.subject.y;
+        })
+        .on('drag', (ev) => {
+            const [px, py] = d3.pointer(ev.sourceEvent, canvas);
+            ev.subject.fx = (px - viewTransform.x) / viewTransform.k;
+            ev.subject.fy = (py - viewTransform.y) / viewTransform.k;
+        })
+        .on('end', (ev) => {
+            if (!ev.active) sim.alphaTarget(0);
+            ev.subject.fx = null;
+            ev.subject.fy = null;
+        }));
 
-    nodeEls = g.append('g').attr('class', 'nodes').selectAll('.node').data(allNodes).enter().append('g')
-        .attr('class', 'node')
-        .call(d3.drag()
-            .on('start', (e, d) => {
-                if (!e.active) sim.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-                d3.select(e.currentTarget).classed('dragging', true);
-            })
-            .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y })
-            .on('end', (e, d) => {
-                if (!e.active) sim.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-                d3.select(e.currentTarget).classed('dragging', false);
-            }))
-        .on('click', (e, d) => { e.stopPropagation(); handleNodeClick(e, d); });
-
-    // Compute star bloom metadata (visual only — never touches the sim).
-    buildStarMeta();
-
-    // Invisible hit-area for touch (min 22px radius = 44px target)
-    nodeEls.append('circle')
-        .attr('class', 'hit')
-        .attr('r', d => Math.max(22, nr(d) + 10))
-        .style('fill', 'transparent')
-        .style('pointer-events', 'all');
-
-    // STAR BODY — stacking outside-in: corona → halo → glow → core → core-hi.
-    // All circles centred at (0,0); the node <g> transform carries them, so the
-    // tick loop is untouched. The brightness IS the body — no solid disc.
-    nodeEls.append('circle')
-        .attr('class', 'corona twinkle')
-        .attr('r', d => sm(d).corona)
-        .style('fill', d => `url(#corona-${d.domain[0]})`)
-        .style('pointer-events', 'none')
-        .style('animation-duration', d => `${sm(d).twDur}s`)
-        .style('animation-delay', d => `${sm(d).twDelay}s`);
-
-    nodeEls.append('circle')
-        .attr('class', 'halo')
-        .attr('r', d => sm(d).halo)
-        .style('fill', d => `url(#halo-${d.domain[0]})`)
-        .style('pointer-events', 'none');
-
-    nodeEls.append('circle')
-        .attr('class', 'glow')
-        .attr('r', d => sm(d).glow)
-        .style('fill', d => `url(#glow-${d.domain[0]})`)
-        .style('opacity', d => sm(d).glowAlpha)
-        .style('pointer-events', 'none');
-
-    nodeEls.append('circle')
-        .attr('class', 'core')
-        .attr('r', d => sm(d).core)
-        .style('fill', d => `url(#core-${d.domain[0]})`)
-        .style('pointer-events', 'none');
-
-    // central highlight — guarantees even the smallest star reads as a point of light
-    nodeEls.append('circle')
-        .attr('class', 'core-hi')
-        .attr('r', d => Math.max(0.7, sm(d).core * 0.42))
-        .style('fill', '#ffffff')
-        .style('pointer-events', 'none');
-
-    // learned/available state mark — a tiny soft tick tucked just outside the core
-    nodeEls.append('circle')
-        .attr('class', 'state-mark')
-        .attr('r', 1.6)
-        .attr('cx', d => sm(d).glow * 0.6)
-        .attr('cy', d => -sm(d).glow * 0.6)
-        .style('pointer-events', 'none');
-
-    nodeEls.append('text')
-        .text(d => nodeLabel(d))
-        .attr('dy', d => Math.max(sm(d).halo * 0.5, nr(d) + 12))
-        .style('font-size', d => d.type === 'field' ? '11px' : '10px')
-        .style('fill', '#d4e4fa')
-        .style('opacity', d => d.type === 'field' ? 0.7 : 0);
-
-    // Hover labels
-    nodeEls.on('mouseenter', (e, d) => {
-        d3.select(e.currentTarget).select('text').style('opacity', 0.9);
-    }).on('mouseleave', (e, d) => {
-        d3.select(e.currentTarget).select('text').style('opacity', shouldShowLabel(d) ? 0.88 : 0);
+    // Hover (star brighten + label + cursor) and click (select / clear).
+    // d3-drag suppresses the click that follows a real drag, so this only fires
+    // for true clicks.
+    canvas.addEventListener('pointermove', (e) => {
+        const [px, py] = d3.pointer(e, canvas);
+        const node = findNodeAtScreen(px, py);
+        renderer.setHover(node ? node.id : null);
+        canvas.style.cursor = node ? 'pointer' : '';
+    });
+    canvas.addEventListener('pointerleave', () => {
+        renderer.setHover(null);
+        canvas.style.cursor = '';
+    });
+    canvas.addEventListener('click', (e) => {
+        const [px, py] = d3.pointer(e, canvas);
+        const node = findNodeAtScreen(px, py);
+        if (node) {
+            handleNodeClick(e, node);
+        } else {
+            setPanelOpenState(false);
+            clearHighlights();
+        }
     });
 
     const simHint = document.getElementById('sim-hint');
@@ -988,209 +929,85 @@ function buildGraph() {
         simHint.classList.add('visible');
     }
 
-    // Warm-up: run 30 ticks without rendering to pre-settle node positions
+    // Warm-up: run 30 ticks without rendering to pre-settle node positions,
+    // then paint the settled frame and start the render loop.
     sim.stop();
     for (let i = 0; i < 30; i++) sim.tick();
-    // Apply settled positions to DOM once
-    linkEls.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-    nodeEls.attr('transform', d => `translate(${d.x},${d.y})`);
-
-    let _tickFrame = null;
-    let _perfMode = false;
-    let _frameTimes = [];
-    let _lastTickTime = 0;
-    let _currentTransform = d3.zoomIdentity;
-    let _cullTimer = 0;
-    // Stars carry a PERMANENT, fixed-size glow: each node group is counter-scaled
-    // by 1/k so the star + halo render at a constant apparent size at every zoom
-    // level (the bloom is an intrinsic part of the star, not something the zoom
-    // grows or shrinks). Pure visual — never affects the sim. Optimised: the
-    // per-node pass runs ONLY when the zoom factor k actually changes (panning
-    // leaves node sizes untouched, so it does zero per-node work).
-    let _nodeScale = 1;
-    let _scaleRaf = 0;
-    let _lastScaleK = 1;
-    const _nodeElArr = nodeEls.nodes();
-    const _linkElArr = linkNodeRefs;
-
-    // Allow localStorage override: 'low' forces perf-mode, 'high' disables it
-    const _perfOverride = (() => { try { return localStorage.getItem('nodus-perf'); } catch { return null; } })();
-
-    // Viewport culling state
-    let _visibleNodes = new Uint8Array(allNodes.length); // 1 = visible
-    _visibleNodes.fill(1); // all visible initially
-
-    function getViewBounds() {
-        const t = _currentTransform;
-        const w = window.innerWidth, h = window.innerHeight;
-        // Padding in world coords. Stars are a fixed SCREEN size, so their world
-        // footprint grows as 1/k when zoomed out — add a bloom margin (~120 screen
-        // px → 120/k world) so edge stars don't pop out while their glow shows.
-        const pad = 80 + Math.min(900, 120 / t.k);
-        return {
-            x0: (-t.x / t.k) - pad,
-            y0: (-t.y / t.k) - pad,
-            x1: (w - t.x) / t.k + pad,
-            y1: (h - t.y) / t.k + pad
-        };
-    }
-
-    function updateCulling() {
-        const b = getViewBounds();
-        for (let i = 0; i < allNodes.length; i++) {
-            const d = allNodes[i];
-            const vis = d.x >= b.x0 && d.x <= b.x1 && d.y >= b.y0 && d.y <= b.y1 ? 1 : 0;
-            if (_visibleNodes[i] !== vis) {
-                _visibleNodes[i] = vis;
-                const el = _nodeElArr[i];
-                el.style.display = vis ? '' : 'none';
-                // Re-apply the current fixed-size scale on reveal — otherwise a
-                // node that was culled across a zoom keeps a stale scale and the
-                // star renders at the wrong (often tiny) size = "glow vanished".
-                if (vis) el.setAttribute('transform', `translate(${d.x},${d.y}) scale(${_nodeScale})`);
-            }
-        }
-        // Cull links: hide if both endpoints off-screen
-        for (let i = 0; i < allEdges.length; i++) {
-            const e = allEdges[i];
-            const sVis = e.source.x >= b.x0 && e.source.x <= b.x1 && e.source.y >= b.y0 && e.source.y <= b.y1;
-            const tVis = e.target.x >= b.x0 && e.target.x <= b.x1 && e.target.y >= b.y0 && e.target.y <= b.y1;
-            _linkElArr[i].style.display = (sVis || tVis) ? '' : 'none';
-        }
-    }
-
-    // Perf-mode: disable expensive visual effects on low-end devices
-    function setPerfMode(on) {
-        if (_perfMode === on) return;
-        _perfMode = on;
-        document.documentElement.classList.toggle('perf-mode', on);
-    }
-
-    function checkFrameBudget(dt) {
-        if (_perfOverride === 'low') { setPerfMode(true); return; }
-        if (_perfOverride === 'high') { setPerfMode(false); return; }
-        _frameTimes.push(dt);
-        if (_frameTimes.length > 10) _frameTimes.shift();
-        if (_frameTimes.length < 5) return;
-        const avg = _frameTimes.reduce((a, b) => a + b, 0) / _frameTimes.length;
-        if (!_perfMode && avg > 28) setPerfMode(true);
-        else if (_perfMode && avg < 14 && _frameTimes.length >= 10) setPerfMode(false);
-    }
-
-    // Override zoom handler to track transform for culling
-    zoomBehavior.on('zoom', e => {
-        g.attr('transform', e.transform);
-        currentZoom = e.transform.k;
-        _currentTransform = e.transform;
-        // Constant apparent size: counter-scale by 1/k (clamped for safety).
-        // Skip the per-node pass entirely on pan (k unchanged) — sizes are fixed.
-        const k = e.transform.k;
-        if (k !== _lastScaleK) {
-            _lastScaleK = k;
-            // 1/k → exact constant size; clamp covers the full [0.1, 6] zoom range.
-            _nodeScale = Math.min(12, Math.max(0.15, 1 / k));
-            if (!_scaleRaf) {
-                _scaleRaf = requestAnimationFrame(() => {
-                    const s = _nodeScale;
-                    // Update ALL nodes (incl. currently-culled) so a node revealed
-                    // later by panning already carries the correct fixed size.
-                    for (let i = 0; i < allNodes.length; i++) {
-                        const d = allNodes[i];
-                        _nodeElArr[i].setAttribute('transform', `translate(${d.x},${d.y}) scale(${s})`);
-                    }
-                    _scaleRaf = 0;
-                });
-            }
-        }
-        if (!_labelRaf) {
-            _labelRaf = requestAnimationFrame(() => {
-                updateLabelVisibility();
-                _labelRaf = 0;
-            });
-        }
-        // Throttled culling on zoom/pan
-        clearTimeout(_cullTimer);
-        _cullTimer = setTimeout(updateCulling, 60);
-    });
+    renderer.notify();
 
     sim.on('tick', () => {
-        if (_tickFrame) return;
-        _tickFrame = requestAnimationFrame(() => {
-            const now = performance.now();
-            // Update only visible links
-            for (let i = 0; i < allEdges.length; i++) {
-                if (_linkElArr[i].style.display === 'none') continue;
-                const e = allEdges[i];
-                const el = _linkElArr[i];
-                el.setAttribute('x1', e.source.x);
-                el.setAttribute('y1', e.source.y);
-                el.setAttribute('x2', e.target.x);
-                el.setAttribute('y2', e.target.y);
-            }
-            if (focusCurveEls) focusCurveEls.attr('d', d => curvedEdgePath(d));
-            // Update only visible nodes
-            for (let i = 0; i < allNodes.length; i++) {
-                if (!_visibleNodes[i]) continue;
-                const d = allNodes[i];
-                _nodeElArr[i].setAttribute('transform', `translate(${d.x},${d.y}) scale(${_nodeScale})`);
-            }
-            // Ease-to-rest: as the layout nears its stopping point (alpha → alphaMin)
-            // ramp friction up so residual drift glides to a halt instead of freezing
-            // mid-motion. The STOP time is fixed by alphaDecay; this only damps the
-            // leftover velocity, so the final layout is unchanged. Auto-resets to the
-            // base friction whenever the sim is re-heated (drag / zoom / resize).
-            const _a = sim.alpha();
-            if (_a < 0.02) {
-                const tt = Math.min(1, (0.02 - _a) / (0.02 - 0.008));
-                sim.velocityDecay(0.4 + tt * 0.5);   // 0.4 → 0.9 over the last ~0.5s
-            } else if (sim.velocityDecay() !== 0.4) {
-                sim.velocityDecay(0.4);
-            }
-            // Frame budget check
-            if (_lastTickTime) checkFrameBudget(now - _lastTickTime);
-            _lastTickTime = now;
-            _tickFrame = null;
-        });
+        // Ease-to-rest: as the layout nears its stopping point (alpha → alphaMin)
+        // ramp friction up so residual drift glides to a halt instead of freezing
+        // mid-motion. The STOP time is fixed by alphaDecay; this only damps the
+        // leftover velocity, so the final layout is unchanged. Auto-resets to the
+        // base friction whenever the sim is re-heated (drag / zoom / resize).
+        const _a = sim.alpha();
+        if (_a < 0.02) {
+            const tt = Math.min(1, (0.02 - _a) / (0.02 - 0.008));
+            sim.velocityDecay(0.4 + tt * 0.5);   // 0.4 → 0.9 over the last ~0.5s
+        } else if (sim.velocityDecay() !== 0.4) {
+            sim.velocityDecay(0.4);
+        }
+        renderer.notify();
     });
 
     sim.on('end', () => {
         if (!simHint) return;
         simHint.classList.add('fading');
         setTimeout(() => simHint.classList.remove('visible', 'fading'), 520);
-        // Run culling once simulation stabilizes
-        updateCulling();
     });
 
     // Resume simulation after warm-up (tick handler now bound)
     sim.restart();
-
-    svgEl.on('click', () => {
-        setPanelOpenState(false);
-        clearHighlights();
-    });
 
     // Dismiss welcome overlay on first graph interaction
     const _welcomeEl = document.getElementById('welcome-overlay');
     if (_welcomeEl) {
         const _dismissOnWheel = () => {
             dismissWelcomeOverlay();
-            svgEl.on('wheel.welcome', null);
+            canvasSel.on('wheel.welcome', null);
         };
-        svgEl.on('wheel.welcome', _dismissOnWheel);
+        canvasSel.on('wheel.welcome', _dismissOnWheel);
     }
 
-    // Resize handler — update SVG dimensions and recenter simulation
+    // Resize — the renderer resizes its own backing store; just recenter the sim.
     let _resizeTimer = 0;
     window.addEventListener('resize', () => {
         clearTimeout(_resizeTimer);
         _resizeTimer = setTimeout(() => {
-            const nw = window.innerWidth, nh = window.innerHeight;
-            svgEl.attr('width', nw).attr('height', nh);
-            sim.force('center', d3.forceCenter(nw / 2, nh / 2));
+            sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
             sim.alpha(0.1).restart();
         }, 200);
     });
+
+    // Signal for the background particle layer (and anything else) that the
+    // graph is live — the canvas has no .nodes DOM for it to sniff anymore.
+    document.body.classList.add('graph-ready');
+
+    // E2E/diagnostic hooks — the canvas has no per-node DOM to assert against,
+    // so the regression tests read engine state and screen positions instead.
+    window.__nodusApp = {
+        ready: () => allNodes.length > 0,
+        nodeIds: () => allNodes.map(n => n.id),
+        hubId: () => {
+            let best = null, bestDeg = -1;
+            for (const n of allNodes) {
+                const deg = (starMeta[n.id] || {}).degree || 0;
+                if (deg > bestDeg) { bestDeg = deg; best = n; }
+            }
+            return best && best.id;
+        },
+        screenPos: (id) => {
+            const n = nodeMap[id];
+            if (!n) return null;
+            return { x: n.x * viewTransform.k + viewTransform.x, y: n.y * viewTransform.k + viewTransform.y };
+        },
+        worldPos: (id) => { const n = nodeMap[id]; return n ? { x: n.x, y: n.y } : null; },
+        degree: (id) => (starMeta[id] || {}).degree || 0,
+        selectNode: (id) => focusNode(id),
+        debug: () => renderer.debugCounts(),
+        stats: () => renderer.stats,
+    };
 }
 
 // ===== SEMANTIC ZOOM =====
@@ -1204,11 +1021,9 @@ function shouldShowLabel(d) {
 }
 
 function updateLabelVisibility() {
-    if (!nodeEls) return;
-    nodeEls
-        .classed('related-node', d => relatedLabelIds.has(d.id))
-        .select('text')
-        .style('opacity', d => shouldShowLabel(d) ? 0.88 : 0);
+    if (!renderer) return;
+    for (const n of allNodes) ensureVis(n).related = relatedLabelIds.has(n.id);
+    renderer.notify();
 }
 
 function getRelatedNodeIds(nodeId) {
@@ -1274,7 +1089,7 @@ function estimateAdaptiveScale(node, availableWidth, availableHeight) {
 }
 
 function centerViewOnNode(node, duration = 500) {
-    if (!svgEl || !zoomBehavior || !node || Number.isNaN(node.x) || Number.isNaN(node.y)) return;
+    if (!canvasSel || !zoomBehavior || !node || Number.isNaN(node.x) || Number.isNaN(node.y)) return;
     const W = window.innerWidth;
     const H = window.innerHeight;
     const panel = document.getElementById('panel');
@@ -1287,7 +1102,7 @@ function centerViewOnNode(node, duration = 500) {
         .translate(centerX, H / 2)
         .scale(scale)
         .translate(-node.x, -node.y);
-    svgEl.transition().duration(duration).call(zoomBehavior.transform, transform);
+    canvasSel.transition().duration(duration).call(zoomBehavior.transform, transform);
 }
 
 function setPanelOpenState(isOpen) {
@@ -1368,16 +1183,16 @@ function openPanel(d) {
 
     // Highlight
     clearHighlights();
-    nodeEls.classed('selected-node', n => n.id === d.id);
+    for (const n of allNodes) ensureVis(n).selected = (n.id === d.id);
     applyFocusRing(d);
     relatedLabelIds = getRelatedNodeIds(d.id);
     updateLabelVisibility();
     if (lpMode) {
         highlightPrereqChain(d.id);
     } else {
-        linkEls.classed('highlight', l => (l.source.id === d.id || l.target.id === d.id));
+        for (const l of allEdges) ensureVis(l).highlight = (l.source.id === d.id || l.target.id === d.id);
     }
-    refreshFocusCurves();
+    renderer.notify();
 }
 
 function connItem(node, rel, pending) {
@@ -1461,6 +1276,7 @@ function setupLPMode() {
         btn.classList.toggle('active', lpMode);
         btn.setAttribute('aria-pressed', String(lpMode));
         document.body.classList.toggle('lp-active', lpMode);
+        if (renderer) renderer.setLpMode(lpMode);
         document.getElementById('learned-info').style.display = lpMode ? 'block' : 'none';
         if (lpMode) {
             applyLPVisibility();
@@ -1493,30 +1309,36 @@ function applyLPVisibility() {
         prereqEdgeSet.add(edgeKey(e.target, e.source));
     }
 
-    nodeEls.classed('dimmed', d => !prereqNodes.has(d.id) && !learnedSet.has(d.id));
-    linkEls.classed('dimmed-link', true).classed('prereq-path', false).attr('marker-end', null);
-
-    // Show prereq edges with arrows
-    linkEls.each(function (d) {
-        const sId = d.source.id || d.source;
-        const tId = d.target.id || d.target;
+    for (const n of allNodes) {
+        const v = ensureVis(n);
+        v.dimmed = !prereqNodes.has(n.id) && !learnedSet.has(n.id);
+        v.learned = learnedSet.has(n.id);
+        v.available = isAvailable(n.id);
+    }
+    // Prereq edges light up as gold focus-curves with arrowheads; everything
+    // else recedes (the old .dimmed-link / .prereq-path class semantics).
+    for (const e of allEdges) {
+        const v = ensureVis(e);
+        const sId = e.source.id || e.source;
+        const tId = e.target.id || e.target;
         const isPrereq = prereqEdgeSet.has(edgeKey(sId, tId));
-        if (isPrereq) {
-            d3.select(this).classed('dimmed-link', false).classed('prereq-path', true)
-                .attr('marker-end', 'url(#arrow)');
-        }
-    });
-
-    nodeEls.classed('learned', d => learnedSet.has(d.id));
-    nodeEls.classed('available', d => isAvailable(d.id));
+        v.prereqPath = isPrereq;
+        v.dimmed = !isPrereq;
+    }
     updateLabelVisibility();
-    refreshFocusCurves();
+    renderer.notify();
 }
 
 function clearLPState() {
-    nodeEls.classed('learned', false).classed('available', false).classed('on-path', false);
-    linkEls.classed('prereq-path', false).classed('dimmed-link', false).attr('marker-end', null);
-    refreshFocusCurves();
+    for (const n of allNodes) {
+        const v = ensureVis(n);
+        v.learned = false; v.available = false; v.onPath = false;
+    }
+    for (const e of allEdges) {
+        const v = ensureVis(e);
+        v.prereqPath = false; v.dimmed = false;
+    }
+    renderer.notify();
 }
 
 function toggleLearned(id) {
@@ -1610,49 +1432,41 @@ function highlightPrereqChain(id) {
             onPathPrereqEdgeSet.add(edgeKey(pe.target, pe.source));
         }
     }
-    nodeEls.classed('on-path', d => onPath.has(d.id));
+    for (const n of allNodes) ensureVis(n).onPath = onPath.has(n.id);
 
-    linkEls.each(function (d) {
-        const sId = d.source.id || d.source;
-        const tId = d.target.id || d.target;
-        const isOnChain = onPathPrereqEdgeSet.has(edgeKey(sId, tId));
-        if (isOnChain) d3.select(this).classed('prereq-path', true);
-    });
-    refreshFocusCurves();
+    for (const e of allEdges) {
+        const sId = e.source.id || e.source;
+        const tId = e.target.id || e.target;
+        if (onPathPrereqEdgeSet.has(edgeKey(sId, tId))) ensureVis(e).prereqPath = true;
+    }
+    renderer.notify();
 }
 
 // Dual-concentric focus ring — a luminous white star-ring shown ONLY on the
-// selected node. Appended to that node's <g> so it rides the group transform
-// (no per-tick cost). Removed on deselect / reselect.
+// selected node. Painted by the canvas renderer each frame at the node's live
+// position (the ring geometry derives from the node's star metadata).
 function applyFocusRing(d) {
-    removeFocusRing();
-    const idx = allNodes.indexOf(d);
-    if (idx < 0 || !nodeEls) return;
-    const el = nodeEls.nodes()[idx];
-    if (!el) return;
-    const m = sm(d);
-    const ringR = Math.max(m.halo * 0.7, m.core * 5) + 6;
-    const g = d3.select(el).append('g').attr('class', 'focus-ring').attr('pointer-events', 'none');
-    // outer soft bloom
-    g.append('circle').attr('class', 'fr-bloom').attr('r', ringR + 3);
-    // bright glowing band
-    g.append('circle').attr('class', 'fr-band').attr('r', ringR);
-    // sharp inner hairline — the second concentric ring
-    g.append('circle').attr('class', 'fr-edge').attr('r', ringR - 4);
+    if (renderer) renderer.setSelected(d);
 }
 function removeFocusRing() {
-    if (nodeEls) nodeEls.selectAll('.focus-ring').remove();
+    if (renderer) renderer.setSelected(null);
 }
 
 function clearHighlights() {
-    linkEls.classed('highlight', false);
-    nodeEls.classed('selected-node', false);
-    nodeEls.classed('on-path', false);
+    if (!renderer) return;
+    for (const e of allEdges) {
+        const v = ensureVis(e);
+        v.highlight = false;
+        if (!lpMode) v.prereqPath = false;
+    }
+    for (const n of allNodes) {
+        const v = ensureVis(n);
+        v.selected = false; v.onPath = false;
+    }
     removeFocusRing();
     relatedLabelIds = new Set();
     updateLabelVisibility();
-    if (!lpMode) linkEls.classed('prereq-path', false);
-    refreshFocusCurves();
+    renderer.notify();
 }
 
 // ===== SEARCH (fixed: event delegation, no XSS) =====

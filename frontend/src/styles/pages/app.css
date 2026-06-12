@@ -9,21 +9,14 @@
    Global tokens (fonts, radii, shadow, accent) live in public/nodus-theme.css;
    edge/badge colours in src/shared.css. Nothing is inlined in the HTML.
    ════════════════════════════════════════════════════════════════════════ */
+/* NOTE (canvas renderer): app.html's graph is painted to <canvas> by
+   src/engine/canvas-renderer.js — the SVG star/edge/photon/focus-ring/perf
+   stylesheets are no longer imported here. The shared components/ files still
+   exist because explorer.html (still SVG) imports them. */
 @import "../components/tokens.css";
 @import "../components/keyframes.css";
 @import "../components/_base.css";
 @import "../app/_base.css";
-@import "../components/edges.css";
-@import "../app/edges.css";
-@import "../components/photon.css";
-@import "../components/nodes.css";
-@import "../app/nodes.css";
-@import "../app/node-states.css";
-@import "../components/focus-ring.css";
-@import "../app/focus-ring.css";
-@import "../components/perf.css";
-@import "../app/perf.css";
-@import "../app/arrow-markers.css";
 @import "../components/panel.css";
 @import "../app/panel.css";
 @import "../components/badge.css";

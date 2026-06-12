@@ -46,7 +46,7 @@ if (cv) {
         }
         lastFrameTime = now;
 
-        if (!graphLoaded && document.querySelector('.nodes')) {
+        if (!graphLoaded && document.body.classList.contains('graph-ready')) {
             graphLoaded = true;
             cv.style.opacity = '0.4';
         }

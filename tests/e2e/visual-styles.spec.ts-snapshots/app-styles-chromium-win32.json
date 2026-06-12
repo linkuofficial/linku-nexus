@@ -108,7 +108,7 @@
       "box-shadow": "rgba(0, 0, 0, 0.38) 0px 10px 30px 0px",
       "opacity": "0.22",
       "width": "302.969px",
-      "height": "121px",
+      "height": "108px",
       "max-width": "none",
       "display": "block",
       "gap": "normal",
@@ -117,7 +117,7 @@
       "top": "20px",
       "left": "20px",
       "right": "957.031px",
-      "bottom": "579px",
+      "bottom": "592px",
       "transform": "matrix(1, 0, 0, 1, 0, -18)",
       "z-index": "6"
     },

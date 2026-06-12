@@ -837,6 +837,13 @@ function buildGraph() {
         label: labelInfo,
     });
 
+    // Canvas text can't wait for webfonts: the first frame may paint labels in a
+    // fallback face. Repaint once IBM Plex Mono is ready (matters most under
+    // prefers-reduced-motion, where the loop is otherwise idle).
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { if (renderer) renderer.notify(); });
+    }
+
     let _labelRaf = 0;
     zoomBehavior = d3.zoom().scaleExtent([0.1, 6])
         .filter((ev) => {
@@ -1209,9 +1216,34 @@ function openPanel(d) {
     if (lpMode) {
         highlightPrereqChain(d.id);
     } else {
-        for (const l of allEdges) ensureVis(l).highlight = (l.source.id === d.id || l.target.id === d.id);
+        setIncidentHighlight(d);
     }
     renderer.notify();
+}
+
+// Light a node's edges, but for a super-hub keep only its top-N most important
+// connections at full strength — the rest become quiet "secondary" threads so
+// the lit fan doesn't blow out into a starburst.
+function setIncidentHighlight(d) {
+    const TOP_N = 16;
+    const incident = [];
+    for (const l of allEdges) {
+        const v = ensureVis(l);
+        const isInc = (l.source.id === d.id || l.target.id === d.id);
+        v.highlight = isInc;
+        v.secondary = false;
+        if (isInc) incident.push(l);
+    }
+    if (incident.length > TOP_N) {
+        const score = (l) => {
+            const other = (l.source.id === d.id) ? l.target : l.source;
+            const m = sm(other);
+            const tierW = m.tier === 'primary' ? 2 : (m.tier === 'secondary' ? 1 : 0);
+            return tierW * 1000 + (m.degree || 0);
+        };
+        incident.sort((a, b) => score(b) - score(a));
+        for (let i = TOP_N; i < incident.length; i++) ensureVis(incident[i]).secondary = true;
+    }
 }
 
 function connItem(node, rel, pending) {
@@ -1476,6 +1508,7 @@ function clearHighlights() {
     for (const e of allEdges) {
         const v = ensureVis(e);
         v.highlight = false;
+        v.secondary = false;
         if (!lpMode) v.prereqPath = false;
     }
     for (const n of allNodes) {

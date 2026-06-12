@@ -255,6 +255,11 @@ export function createCanvasRenderer(opts) {
                     if (!onChain) { strength = 0.22; photonOn = false; }
                 }
             }
+            // Super-hub restraint: a node with dozens of edges marks all but its
+            // top-N most important connections as "secondary" — those stay as
+            // quiet threads (no photon) so the lit fan reads as a few strong
+            // links, not a blinding starburst.
+            if (e.vis && e.vis.secondary) { strength *= 0.4; photonOn = false; }
             const a = litA * strength;
             const sxp = e.source.x * k + tx, syp = e.source.y * k + ty;
             const txp = e.target.x * k + tx, typ = e.target.y * k + ty;
@@ -421,26 +426,45 @@ export function createCanvasRenderer(opts) {
         ctx.restore();
     }
 
+    // Grid keys a label can cover (its text box spans ~CW px around the centre).
+    const LBL_CW = 96, LBL_CH = 16;
+
     function drawLabels(k, tx, ty) {
         ctx.lineJoin = 'round';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
         const canSpace = 'letterSpacing' in ctx;
+
+        // Gather visible candidates, then place them strongest-first into an
+        // occupancy grid so ambient field labels in dense clusters stop stacking
+        // on top of each other. High-priority labels (selected / hovered /
+        // related — alpha ≥ 0.9) are always drawn and reserve their cells.
+        const cands = [];
         for (const n of nodes) {
             const a = anims.get(n.id);
             if (!a || a.label.c < 0.02 || !a.lastInfo) continue;
-            const info = a.lastInfo;
             const sx = n.x * k + tx, sy = n.y * k + ty;
             if (sx < -160 || sx > width + 160 || sy < -160 || sy > height + 160) continue;
-            ctx.globalAlpha = a.label.c;
+            cands.push({ a, info: a.lastInfo, sx, sy: sy + a.lastInfo.dy });
+        }
+        cands.sort((p, q) => (q.a.label.c - p.a.label.c) || ((q.info.field ? 1 : 0) - (p.info.field ? 1 : 0)));
+
+        const occupied = new Set();
+        for (const c of cands) {
+            const gx = Math.round(c.sx / LBL_CW), gy = Math.round(c.sy / LBL_CH);
+            const strong = c.a.label.c >= 0.9;
+            const key = gx + ',' + gy, keyL = (gx - 1) + ',' + gy, keyR = (gx + 1) + ',' + gy;
+            if (!strong && (occupied.has(key) || occupied.has(keyL) || occupied.has(keyR))) continue;
+            occupied.add(key);
+            const info = c.info;
+            ctx.globalAlpha = c.a.label.c;
             ctx.font = `${info.size}px 'IBM Plex Mono', monospace`;
             if (canSpace) ctx.letterSpacing = info.field ? THEME.labels.field.spacing : '0px';
-            // CSS paint-order: stroke — dark outline behind the glyphs.
-            ctx.strokeStyle = 'rgba(4,7,12,0.92)';
+            ctx.strokeStyle = 'rgba(4,7,12,0.92)';   // CSS paint-order: stroke
             ctx.lineWidth = 3;
-            ctx.strokeText(info.text, sx, sy + info.dy);
+            ctx.strokeText(info.text, c.sx, c.sy);
             ctx.fillStyle = '#d4e4fa';
-            ctx.fillText(info.text, sx, sy + info.dy);
+            ctx.fillText(info.text, c.sx, c.sy);
         }
         if (canSpace) ctx.letterSpacing = '0px';
         ctx.globalAlpha = 1;

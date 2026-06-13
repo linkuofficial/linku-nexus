@@ -13,11 +13,8 @@
 @import "../components/tokens.css";
 @import "../components/keyframes.css";
 @import "../components/_base.css";
-@import "../components/edges.css";
-@import "../components/photon.css";
-@import "../components/nodes.css";
-@import "../components/focus-ring.css";
-@import "../components/perf.css";
+/* SVG graph-visual styles (edges/photon/nodes/focus-ring/perf) removed —
+   explorer renders the graph to <canvas> now; those styled DOM no longer exist. */
 @import "../components/panel.css";
 @import "../components/badge.css";
 @import "../components/connections.css";
@@ -29,14 +26,9 @@
 @import "../components/language-toggle.css";
 @import "../components/loading.css";
 @import "../components/welcome.css";
-@import "../explorer/particles.css";
-@import "../explorer/edges.css";
-@import "../explorer/nodes.css";
-@import "../explorer/nodes-perf.css";
-@import "../explorer/node-entrance.css";
-@import "../explorer/expand-ring.css";
+/* particles/edges/nodes/nodes-perf/node-entrance/expand-ring/neighbor-badge
+   removed — canvas renderer + overlay replace the old SVG/DOM graph visuals. */
 @import "../explorer/node-tooltip.css";
-@import "../explorer/neighbor-badge.css";
 @import "../explorer/search-result-active.css";
 @import "../explorer/search.css";
 @import "../explorer/header.css";
@@ -49,10 +41,8 @@
 @import "../explorer/breadcrumb.css";
 @import "../explorer/context-menu.css";
 @import "../explorer/filter-bar.css";
-@import "../explorer/path-highlight.css";
 @import "../explorer/recommendation.css";
 @import "../explorer/onboarding.css";
 @import "../explorer/zoom-indicator.css";
 @import "../explorer/shortcuts.css";
-@import "../explorer/perf.css";
 @import "../explorer/responsive.css";

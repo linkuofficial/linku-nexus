@@ -1,7 +1,0 @@
-/* particles — explorer.html only. */
-/* Background particle canvas */
-
-.perf-mode #bgCanvas {
-    opacity: 0.18;
-    transition: opacity 0.4s var(--ease-ui);
-}

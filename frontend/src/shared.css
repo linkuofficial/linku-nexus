@@ -6,35 +6,9 @@
  * Load this before the per-page <style> block so per-page rules can override.
  */
 
-/* ── Graph edge (link) type colours ─────────────────────────────────────── */
-/* These are the canonical semantic colours for the knowledge-graph edge types.
- * Update here to retheme all views at once. */
-
-.link.logical {
-    stroke: #5b9bd5;
-}
-
-.link.historical {
-    stroke: #c9a05a;
-}
-
-.link.applied {
-    stroke: #5bc97a;
-}
-
-.link.conceptual {
-    stroke: #9b7bc9;
-}
-
-.link.causal {
-    stroke: #c95b5b;
-}
-
-/* Pending / animated edges */
-.link.pending {
-    stroke-dasharray: 4, 3;
-    stroke-opacity: 0.02;
-}
+/* Edge (link) colours moved to nodus-tokens.js (RELATION_COLORS) — both graphs
+ * render to <canvas> now and read those tokens directly; the old SVG .link.*
+ * stroke rules are gone. */
 
 /* ── Domain badge ────────────────────────────────────────────────────────── */
 .d-badge {
